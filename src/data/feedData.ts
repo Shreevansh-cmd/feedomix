@@ -1,8 +1,172 @@
+import { FeedFormula, BirdType } from '@/pages/Index';
 
-import { BirdType, FeedFormula } from '@/pages/Index';
+export const birdTypes: BirdType[] = [
+  {
+    id: 'broiler',
+    name: 'Broiler',
+    phases: [
+      {
+        id: 'broiler-pre-starter',
+        name: 'Pre-Starter',
+        ageRange: '0-10 Days',
+        protein: '23%',
+        energy: '3000 kcal/kg',
+        formula: {
+          'Maize': 530,
+          'Soya DOC': 380,
+          'Rice Bran': 20,
+          'Vegetable Oil': 35,
+          'DCP': 20,
+          'Limestone Powder': 8,
+          'Salt': 3,
+          'Broiler Premix': 2.5,
+          'Toxin Binder': 1,
+          'Coccidiostat': 0.5,
+        }
+      },
+      {
+        id: 'broiler-starter',
+        name: 'Starter',
+        ageRange: '11-24 Days',
+        protein: '22%',
+        energy: '3100 kcal/kg',
+        formula: {
+          'Maize': 550,
+          'Soya DOC': 350,
+          'Rice Bran': 25,
+          'Vegetable Oil': 40,
+          'DCP': 18,
+          'Limestone Powder': 8,
+          'Salt': 3,
+          'Broiler Premix': 2.5,
+          'Toxin Binder': 1,
+          'Coccidiostat': 0.5,
+        }
+      },
+      {
+        id: 'broiler-finisher',
+        name: 'Finisher',
+        ageRange: '25 Days to Slaughter',
+        protein: '20%',
+        energy: '3200 kcal/kg',
+        formula: {
+          'Maize': 580,
+          'Soya DOC': 300,
+          'Rice Bran': 30,
+          'Vegetable Oil': 50,
+          'DCP': 15,
+          'Limestone Powder': 7,
+          'Salt': 3,
+          'Broiler Premix': 2.5,
+          'Toxin Binder': 1,
+          'Coccidiostat': 0.5,
+        }
+      },
+    ],
+  },
+  {
+    id: 'layer',
+    name: 'Layer',
+    phases: [
+      {
+        id: 'layer-chick',
+        name: 'Chick',
+        ageRange: '0-6 Weeks',
+        protein: '20%',
+        energy: '2900 kcal/kg',
+        formula: {
+          'Maize': 520,
+          'Soya DOC': 320,
+          'Rice Bran': 50,
+          'Vegetable Oil': 25,
+          'DCP': 22,
+          'Limestone Powder': 15,
+          'Salt': 3,
+          'Layer Premix': 2.5,
+          'Toxin Binder': 1,
+          'Coccidiostat': 0.5,
+        }
+      },
+      {
+        id: 'layer-grower',
+        name: 'Grower',
+        ageRange: '7-14 Weeks',
+        protein: '16%',
+        energy: '2800 kcal/kg',
+        formula: {
+          'Maize': 580,
+          'Soya DOC': 250,
+          'Rice Bran': 80,
+          'Vegetable Oil': 25,
+          'DCP': 20,
+          'Limestone Powder': 25,
+          'Salt': 3,
+          'Layer Premix': 2.5,
+          'Toxin Binder': 1,
+        }
+      },
+      {
+        id: 'layer-pre-lay',
+        name: 'Pre-Lay',
+        ageRange: '15-18 Weeks',
+        protein: '18%',
+        energy: '2850 kcal/kg',
+        formula: {
+          'Maize': 560,
+          'Soya DOC': 280,
+          'Rice Bran': 60,
+          'Vegetable Oil': 28,
+          'DCP': 21,
+          'Limestone Powder': 30,
+          'Salt': 3,
+          'Layer Premix': 2.5,
+          'Toxin Binder': 1,
+        }
+      },
+      {
+        id: 'layer-layer1',
+        name: 'Layer 1',
+        ageRange: '19-40 Weeks',
+        protein: '17%',
+        energy: '2900 kcal/kg',
+        formula: {
+          'Maize': 550,
+          'Soya DOC': 200,
+          'Rice Bran': 80,
+          'Vegetable Oil': 30,
+          'DCP': 18,
+          'Limestone Powder': 100,
+          'Salt': 3,
+          'Layer Premix': 2.5,
+          'Toxin Binder': 1,
+        }
+      },
+      {
+        id: 'layer-layer2',
+        name: 'Layer 2',
+        ageRange: '41-72 Weeks',
+        protein: '16%',
+        energy: '2850 kcal/kg',
+        formula: {
+          'Maize': 560,
+          'Soya DOC': 180,
+          'Rice Bran': 90,
+          'Vegetable Oil': 25,
+          'DCP': 16,
+          'Limestone Powder': 105,
+          'Salt': 3,
+          'Layer Premix': 2.5,
+          'Toxin Binder': 1,
+        }
+      },
+    ],
+  },
+];
 
+// Complete feed formulas with all missing combinations
 export const feedFormulas: { [key: string]: FeedFormula } = {
-  'broiler-prestarter': {
+  // Broiler formulas
+  'broiler-pre-starter': {
     'Maize': 530,
     'Soya DOC': 380,
     'Rice Bran': 20,
@@ -12,7 +176,7 @@ export const feedFormulas: { [key: string]: FeedFormula } = {
     'Salt': 3,
     'Broiler Premix': 2.5,
     'Toxin Binder': 1,
-    'Coccidiostat': 0.5
+    'Coccidiostat': 0.5,
   },
   'broiler-starter': {
     'Maize': 550,
@@ -24,7 +188,7 @@ export const feedFormulas: { [key: string]: FeedFormula } = {
     'Salt': 3,
     'Broiler Premix': 2.5,
     'Toxin Binder': 1,
-    'Coccidiostat': 0.5
+    'Coccidiostat': 0.5,
   },
   'broiler-finisher': {
     'Maize': 580,
@@ -36,7 +200,21 @@ export const feedFormulas: { [key: string]: FeedFormula } = {
     'Salt': 3,
     'Broiler Premix': 2.5,
     'Toxin Binder': 1,
-    'Coccidiostat': 0.5
+    'Coccidiostat': 0.5,
+  },
+  
+  // Layer formulas - adding missing ones
+  'layer-chick': {
+    'Maize': 520,
+    'Soya DOC': 320,
+    'Rice Bran': 50,
+    'Vegetable Oil': 25,
+    'DCP': 22,
+    'Limestone Powder': 15,
+    'Salt': 3,
+    'Layer Premix': 2.5,
+    'Toxin Binder': 1,
+    'Coccidiostat': 0.5,
   },
   'layer-grower': {
     'Maize': 580,
@@ -47,9 +225,20 @@ export const feedFormulas: { [key: string]: FeedFormula } = {
     'Limestone Powder': 25,
     'Salt': 3,
     'Layer Premix': 2.5,
-    'Toxin Binder': 1
+    'Toxin Binder': 1,
   },
-  'layer-feed': {
+  'layer-pre-lay': {
+    'Maize': 560,
+    'Soya DOC': 280,
+    'Rice Bran': 60,
+    'Vegetable Oil': 28,
+    'DCP': 21,
+    'Limestone Powder': 30,
+    'Salt': 3,
+    'Layer Premix': 2.5,
+    'Toxin Binder': 1,
+  },
+  'layer-layer1': {
     'Maize': 550,
     'Soya DOC': 200,
     'Rice Bran': 80,
@@ -58,86 +247,35 @@ export const feedFormulas: { [key: string]: FeedFormula } = {
     'Limestone Powder': 100,
     'Salt': 3,
     'Layer Premix': 2.5,
-    'Toxin Binder': 1
-  }
+    'Toxin Binder': 1,
+  },
+  'layer-layer2': {
+    'Maize': 560,
+    'Soya DOC': 180,
+    'Rice Bran': 90,
+    'Vegetable Oil': 25,
+    'DCP': 16,
+    'Limestone Powder': 105,
+    'Salt': 3,
+    'Layer Premix': 2.5,
+    'Toxin Binder': 1,
+  },
 };
 
-export const birdTypes: BirdType[] = [
-  {
-    id: 'broiler',
-    name: 'Broiler',
-    phases: [
-      {
-        id: 'prestarter',
-        name: 'Pre-starter',
-        ageRange: '0–10 days',
-        protein: '22–23%',
-        energy: '2900–3000 kcal/kg',
-        formula: feedFormulas['broiler-prestarter']
-      },
-      {
-        id: 'starter',
-        name: 'Starter',
-        ageRange: '11–21 days',
-        protein: '20–22%',
-        energy: '3000–3100 kcal/kg',
-        formula: feedFormulas['broiler-starter']
-      },
-      {
-        id: 'finisher',
-        name: 'Finisher',
-        ageRange: '22–42 days',
-        protein: '18–19%',
-        energy: '3200–3300 kcal/kg',
-        formula: feedFormulas['broiler-finisher']
-      }
-    ]
-  },
-  {
-    id: 'layer',
-    name: 'Layer',
-    phases: [
-      {
-        id: 'chick',
-        name: 'Chick',
-        ageRange: '0–8 weeks',
-        protein: '20–21%',
-        energy: '2800 kcal/kg'
-      },
-      {
-        id: 'grower',
-        name: 'Grower',
-        ageRange: '9–18 weeks',
-        protein: '16–17%',
-        energy: '2700 kcal/kg',
-        formula: feedFormulas['layer-grower']
-      },
-      {
-        id: 'prelay',
-        name: 'Pre-lay',
-        ageRange: '19–20 weeks',
-        protein: '17–18%',
-        energy: '2750 kcal/kg'
-      },
-      {
-        id: 'layer1',
-        name: 'Layer 1',
-        ageRange: '21–40 weeks',
-        protein: '18–19%',
-        energy: '2750–2800 kcal/kg',
-        formula: feedFormulas['layer-feed']
-      },
-      {
-        id: 'layer2',
-        name: 'Layer 2',
-        ageRange: '41–72 weeks',
-        protein: '16–17%',
-        energy: '2700–2750 kcal/kg',
-        formula: feedFormulas['layer-feed']
-      }
-    ]
-  }
-];
+// Nutritional content of ingredients (per kg)
+export const ingredientNutrition: { [key: string]: { protein: number; energy: number } } = {
+  'Maize': { protein: 85, energy: 3350 },
+  'Soya DOC': { protein: 440, energy: 2230 },
+  'Rice Bran': { protein: 125, energy: 2650 },
+  'Vegetable Oil': { protein: 0, energy: 8800 },
+  'DCP': { protein: 0, energy: 0 },
+  'Limestone Powder': { protein: 0, energy: 0 },
+  'Salt': { protein: 0, energy: 0 },
+  'Broiler Premix': { protein: 0, energy: 0 },
+  'Layer Premix': { protein: 0, energy: 0 },
+  'Toxin Binder': { protein: 0, energy: 0 },
+  'Coccidiostat': { protein: 0, energy: 0 },
+};
 
 export const availableIngredients = [
   'Maize',
@@ -150,5 +288,5 @@ export const availableIngredients = [
   'Broiler Premix',
   'Layer Premix',
   'Toxin Binder',
-  'Coccidiostat'
+  'Coccidiostat',
 ];
