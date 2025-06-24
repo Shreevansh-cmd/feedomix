@@ -47,7 +47,7 @@ const Ingredients = () => {
 
   const fetchIngredients = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('feed_ingredients')
         .select('*')
         .order('name');
@@ -71,7 +71,7 @@ const Ingredients = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('feed_ingredients')
         .insert([{
           user_id: user.id,
@@ -116,7 +116,7 @@ const Ingredients = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('feed_ingredients')
         .delete()
         .eq('id', id);

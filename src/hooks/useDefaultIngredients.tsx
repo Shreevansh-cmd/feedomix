@@ -26,7 +26,7 @@ export const useDefaultIngredients = () => {
 
       try {
         // Check if default ingredients already exist
-        const { data: existingDefaults } = await supabase
+        const { data: existingDefaults } = await (supabase as any)
           .from('feed_ingredients')
           .select('id')
           .eq('is_default', true)
@@ -43,7 +43,7 @@ export const useDefaultIngredients = () => {
           is_default: true,
         }));
 
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('feed_ingredients')
           .insert(ingredientsToInsert);
 
