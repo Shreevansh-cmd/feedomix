@@ -9,16 +9,135 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      feed_ingredients: {
+        Row: {
+          ash_percentage: number | null
+          calcium_percentage: number | null
+          category: Database["public"]["Enums"]["ingredient_category"] | null
+          cost_per_kg: number | null
+          created_at: string
+          energy_kcal_per_kg: number | null
+          fat_percentage: number | null
+          fiber_percentage: number | null
+          id: string
+          is_default: boolean | null
+          moisture_percentage: number | null
+          name: string
+          phosphorus_percentage: number | null
+          protein_percentage: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ash_percentage?: number | null
+          calcium_percentage?: number | null
+          category?: Database["public"]["Enums"]["ingredient_category"] | null
+          cost_per_kg?: number | null
+          created_at?: string
+          energy_kcal_per_kg?: number | null
+          fat_percentage?: number | null
+          fiber_percentage?: number | null
+          id?: string
+          is_default?: boolean | null
+          moisture_percentage?: number | null
+          name: string
+          phosphorus_percentage?: number | null
+          protein_percentage?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ash_percentage?: number | null
+          calcium_percentage?: number | null
+          category?: Database["public"]["Enums"]["ingredient_category"] | null
+          cost_per_kg?: number | null
+          created_at?: string
+          energy_kcal_per_kg?: number | null
+          fat_percentage?: number | null
+          fiber_percentage?: number | null
+          id?: string
+          is_default?: boolean | null
+          moisture_percentage?: number | null
+          name?: string
+          phosphorus_percentage?: number | null
+          protein_percentage?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_status: Database["public"]["Enums"]["user_status"] | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+          user_status?: Database["public"]["Enums"]["user_status"] | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_status?: Database["public"]["Enums"]["user_status"] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      approve_user: {
+        Args: { target_user_id: string }
+        Returns: boolean
+      }
+      get_pending_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          full_name: string
+          created_at: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      ingredient_category:
+        | "Protein Sources"
+        | "Energy Sources"
+        | "Minerals"
+        | "Additives"
+        | "Other"
+      user_status: "pending" | "active" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +252,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      ingredient_category: [
+        "Protein Sources",
+        "Energy Sources",
+        "Minerals",
+        "Additives",
+        "Other",
+      ],
+      user_status: ["pending", "active", "suspended"],
+    },
   },
 } as const
