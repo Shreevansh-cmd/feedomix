@@ -23,6 +23,14 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   const checkUserStatus = async () => {
     try {
+      // Check if this is the predefined admin email
+      if (user?.email === 'whiteshadow1136@gmail.com') {
+        // Automatically set as active admin - no approval needed
+        setUserStatus('active');
+        setStatusLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('user_status')

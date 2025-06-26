@@ -18,6 +18,12 @@ export const Navbar = () => {
 
   const checkAdminStatus = async () => {
     try {
+      // Check if this is the predefined admin email
+      if (user?.email === 'whiteshadow1136@gmail.com') {
+        setIsAdmin(true);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('admin_users')
         .select('id')
@@ -46,6 +52,11 @@ export const Navbar = () => {
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <User className="h-4 w-4" />
                 <span>{user.email}</span>
+                {user.email === 'whiteshadow1136@gmail.com' && (
+                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full ml-2">
+                    Admin
+                  </span>
+                )}
               </div>
               <Link to="/ingredients">
                 <Button variant="outline" size="sm">
