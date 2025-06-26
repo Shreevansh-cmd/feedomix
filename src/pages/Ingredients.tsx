@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,11 +10,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, Plus, Edit } from 'lucide-react';
+import { Database } from '@/integrations/supabase/types';
+
+type IngredientCategory = Database['public']['Enums']['ingredient_category'];
 
 interface FeedIngredient {
   id: string;
   name: string;
-  category: string;
+  category: IngredientCategory;
   protein_percentage: number;
   energy_kcal_per_kg: number;
   fat_percentage: number;
@@ -28,7 +30,7 @@ interface FeedIngredient {
   is_default: boolean;
 }
 
-const categories = [
+const categories: IngredientCategory[] = [
   'Protein Sources',
   'Energy Sources',
   'Minerals',
@@ -44,7 +46,7 @@ const Ingredients = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    category: 'Other',
+    category: 'Other' as IngredientCategory,
     protein_percentage: '',
     energy_kcal_per_kg: '',
     fat_percentage: '',
@@ -87,7 +89,7 @@ const Ingredients = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      category: 'Other',
+      category: 'Other' as IngredientCategory,
       protein_percentage: '',
       energy_kcal_per_kg: '',
       fat_percentage: '',
@@ -125,7 +127,7 @@ const Ingredients = () => {
     try {
       const ingredientData = {
         name: formData.name,
-        category: formData.category,
+        category: formData.category as IngredientCategory,
         protein_percentage: parseFloat(formData.protein_percentage) || 0,
         energy_kcal_per_kg: parseFloat(formData.energy_kcal_per_kg) || 0,
         fat_percentage: parseFloat(formData.fat_percentage) || 0,
@@ -215,7 +217,7 @@ const Ingredients = () => {
   const groupedIngredients = categories.reduce((acc, category) => {
     acc[category] = ingredients.filter(ing => ing.category === category);
     return acc;
-  }, {} as Record<string, FeedIngredient[]>);
+  }, {} as Record<IngredientCategory, FeedIngredient[]>);
 
   const userIngredients = ingredients.filter(ing => !ing.is_default);
   const defaultIngredients = ingredients.filter(ing => ing.is_default);
@@ -258,7 +260,7 @@ const Ingredients = () => {
 
                 <div>
                   <Label htmlFor="category">Category *</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                  <Select value={formData.category} onValueChange={(value: IngredientCategory) => setFormData({ ...formData, category: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>

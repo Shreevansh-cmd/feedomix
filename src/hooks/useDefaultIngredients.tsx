@@ -2,11 +2,25 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 
-const defaultIngredients = [
+type IngredientCategory = Database['public']['Enums']['ingredient_category'];
+
+const defaultIngredients: Array<{
+  name: string;
+  category: IngredientCategory;
+  protein_percentage: number;
+  energy_kcal_per_kg: number;
+  fat_percentage: number;
+  fiber_percentage: number;
+  moisture_percentage: number;
+  ash_percentage: number;
+  calcium_percentage: number;
+  phosphorus_percentage: number;
+}> = [
   { 
     name: 'Maize', 
-    category: 'Energy Sources',
+    category: 'Energy Sources' as IngredientCategory,
     protein_percentage: 8.5, 
     energy_kcal_per_kg: 3350, 
     fat_percentage: 3.8, 
@@ -18,7 +32,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Soya DOC', 
-    category: 'Protein Sources',
+    category: 'Protein Sources' as IngredientCategory,
     protein_percentage: 44.0, 
     energy_kcal_per_kg: 2230, 
     fat_percentage: 0.8, 
@@ -30,7 +44,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Rice Bran', 
-    category: 'Energy Sources',
+    category: 'Energy Sources' as IngredientCategory,
     protein_percentage: 12.5, 
     energy_kcal_per_kg: 2650, 
     fat_percentage: 15.0, 
@@ -42,7 +56,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Vegetable Oil', 
-    category: 'Energy Sources',
+    category: 'Energy Sources' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 8800, 
     fat_percentage: 99.0, 
@@ -54,7 +68,7 @@ const defaultIngredients = [
   },
   { 
     name: 'DCP', 
-    category: 'Minerals',
+    category: 'Minerals' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -66,7 +80,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Limestone Powder', 
-    category: 'Minerals',
+    category: 'Minerals' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -78,7 +92,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Salt', 
-    category: 'Minerals',
+    category: 'Minerals' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -90,7 +104,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Broiler Premix', 
-    category: 'Additives',
+    category: 'Additives' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -102,7 +116,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Layer Premix', 
-    category: 'Additives',
+    category: 'Additives' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -114,7 +128,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Toxin Binder', 
-    category: 'Additives',
+    category: 'Additives' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -126,7 +140,7 @@ const defaultIngredients = [
   },
   { 
     name: 'Coccidiostat', 
-    category: 'Additives',
+    category: 'Additives' as IngredientCategory,
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
