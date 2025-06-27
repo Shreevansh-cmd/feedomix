@@ -79,11 +79,11 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
         unit: 'kg',
         percentage: ((proportion * 100)).toFixed(1),
         name: ingredient,
-        protein_percentage: ingredientData?.protein_percentage || 0,
-        fat_percentage: ingredientData?.fat_percentage || 0,
-        fiber_percentage: ingredientData?.fiber_percentage || 0,
-        ash_percentage: ingredientData?.ash_percentage || 0,
-        moisture_percentage: ingredientData?.moisture_percentage || 0
+        protein_percentage: Number(ingredientData?.protein_percentage) || 0,
+        fat_percentage: Number(ingredientData?.fat_percentage) || 0,
+        fiber_percentage: Number(ingredientData?.fiber_percentage) || 0,
+        ash_percentage: Number(ingredientData?.ash_percentage) || 0,
+        moisture_percentage: Number(ingredientData?.moisture_percentage) || 0
       };
     });
   };
@@ -100,29 +100,39 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
   const handleDownloadPDF = () => {
     try {
       // Create a comprehensive report text
-      const reportData = {
-        feedPlan: {
-          birdType: selectedBird?.name,
-          phase: selectedPhase?.name,
-          birdCount: selectedInputs.birdCount,
-          totalDailyFeed: totalDailyFeed.toFixed(1)
-        },
-        ingredients: ingredientQuantities,
-        nutritionalRequirements: {
-          protein: selectedPhase?.protein,
-          energy: selectedPhase?.energy,
-          ageRange: selectedPhase?.ageRange
-        }
-      };
+      const reportLines = [
+        "=== FEED PLAN REPORT ===",
+        `Generated: ${new Date().toLocaleDateString()}`,
+        "",
+        "=== BASIC INFORMATION ===",
+        `Bird Type: ${selectedBird?.name}`,
+        `Phase: ${selectedPhase?.name}`,
+        `Number of Birds: ${selectedInputs.birdCount.toLocaleString()}`,
+        `Daily Feed Requirement: ${totalDailyFeed.toFixed(1)} kg`,
+        "",
+        "=== NUTRITIONAL REQUIREMENTS ===",
+        `Protein: ${selectedPhase?.protein}`,
+        `Energy: ${selectedPhase?.energy}`,
+        `Age Range: ${selectedPhase?.ageRange}`,
+        "",
+        "=== INGREDIENT BREAKDOWN ===",
+        ...ingredientQuantities.map(item => 
+          `${item.ingredient}: ${item.quantity.toFixed(2)} kg (${item.percentage}%)`
+        ),
+        "",
+        "=== NUTRITIONAL ANALYSIS ===",
+        ...ingredientQuantities.map(item => 
+          `${item.ingredient}: Protein ${item.protein_percentage}%, Fat ${item.fat_percentage}%, Fiber ${item.fiber_percentage}%`
+        )
+      ];
 
-      // Convert to JSON string for download
-      const reportContent = JSON.stringify(reportData, null, 2);
-      const blob = new Blob([reportContent], { type: 'application/json' });
+      const reportContent = reportLines.join('\n');
+      const blob = new Blob([reportContent], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `feed-plan-${selectedBird?.name}-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `feed-plan-${selectedBird?.name}-${new Date().toISOString().split('T')[0]}.txt`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

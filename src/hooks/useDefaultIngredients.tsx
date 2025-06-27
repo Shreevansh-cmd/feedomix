@@ -20,7 +20,7 @@ const defaultIngredients: Array<{
 }> = [
   { 
     name: 'Maize', 
-    category: 'Energy Sources' as IngredientCategory,
+    category: 'Energy Sources',
     protein_percentage: 8.5, 
     energy_kcal_per_kg: 3350, 
     fat_percentage: 3.8, 
@@ -32,7 +32,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Soya DOC', 
-    category: 'Protein Sources' as IngredientCategory,
+    category: 'Protein Sources',
     protein_percentage: 44.0, 
     energy_kcal_per_kg: 2230, 
     fat_percentage: 0.8, 
@@ -44,7 +44,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Rice Bran', 
-    category: 'Energy Sources' as IngredientCategory,
+    category: 'Energy Sources',
     protein_percentage: 12.5, 
     energy_kcal_per_kg: 2650, 
     fat_percentage: 15.0, 
@@ -56,7 +56,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Vegetable Oil', 
-    category: 'Energy Sources' as IngredientCategory,
+    category: 'Energy Sources',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 8800, 
     fat_percentage: 99.0, 
@@ -68,7 +68,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'DCP', 
-    category: 'Minerals' as IngredientCategory,
+    category: 'Minerals',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -80,7 +80,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Limestone Powder', 
-    category: 'Minerals' as IngredientCategory,
+    category: 'Minerals',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -92,7 +92,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Salt', 
-    category: 'Minerals' as IngredientCategory,
+    category: 'Minerals',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -104,7 +104,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Broiler Premix', 
-    category: 'Additives' as IngredientCategory,
+    category: 'Additives',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -116,7 +116,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Layer Premix', 
-    category: 'Additives' as IngredientCategory,
+    category: 'Additives',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -128,7 +128,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Toxin Binder', 
-    category: 'Additives' as IngredientCategory,
+    category: 'Additives',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -140,7 +140,7 @@ const defaultIngredients: Array<{
   },
   { 
     name: 'Coccidiostat', 
-    category: 'Additives' as IngredientCategory,
+    category: 'Additives',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
     fat_percentage: 0.0, 
@@ -160,15 +160,16 @@ export const useDefaultIngredients = () => {
       if (!user) return;
 
       try {
-        // Check if default ingredients already exist
+        // Check if default ingredients already exist for this user
         const { data: existingDefaults } = await supabase
           .from('feed_ingredients')
           .select('id')
           .eq('is_default', true)
+          .eq('user_id', user.id)
           .limit(1);
 
         if (existingDefaults && existingDefaults.length > 0) {
-          return; // Default ingredients already exist
+          return; // Default ingredients already exist for this user
         }
 
         // Insert default ingredients with current user's ID
@@ -184,6 +185,8 @@ export const useDefaultIngredients = () => {
 
         if (error) {
           console.error('Error inserting default ingredients:', error);
+        } else {
+          console.log('Default ingredients inserted successfully');
         }
       } catch (error) {
         console.error('Error initializing default ingredients:', error);

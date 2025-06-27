@@ -27,23 +27,23 @@ export const NutrientAnalysis = ({ ingredients, totalFeedWeight }: NutrientAnaly
 
     ingredients.forEach(ingredient => {
       const proportion = ingredient.quantity / totalFeedWeight;
-      totalProtein += (ingredient.protein_percentage || 0) * proportion;
-      totalFat += (ingredient.fat_percentage || 0) * proportion;
-      totalFiber += (ingredient.fiber_percentage || 0) * proportion;
-      totalAsh += (ingredient.ash_percentage || 0) * proportion;
-      totalMoisture += (ingredient.moisture_percentage || 0) * proportion;
+      totalProtein += (Number(ingredient.protein_percentage) || 0) * proportion;
+      totalFat += (Number(ingredient.fat_percentage) || 0) * proportion;
+      totalFiber += (Number(ingredient.fiber_percentage) || 0) * proportion;
+      totalAsh += (Number(ingredient.ash_percentage) || 0) * proportion;
+      totalMoisture += (Number(ingredient.moisture_percentage) || 0) * proportion;
     });
 
     const totalKnownNutrients = totalProtein + totalFat + totalFiber + totalAsh + totalMoisture;
     const carbohydrates = Math.max(0, 100 - totalKnownNutrients);
 
     return {
-      protein: totalProtein,
-      fat: totalFat,
-      fiber: totalFiber,
-      ash: totalAsh,
-      moisture: totalMoisture,
-      carbohydrates: carbohydrates
+      protein: Number(totalProtein.toFixed(2)),
+      fat: Number(totalFat.toFixed(2)),
+      fiber: Number(totalFiber.toFixed(2)),
+      ash: Number(totalAsh.toFixed(2)),
+      moisture: Number(totalMoisture.toFixed(2)),
+      carbohydrates: Number(carbohydrates.toFixed(2))
     };
   };
 
@@ -56,7 +56,7 @@ export const NutrientAnalysis = ({ ingredients, totalFeedWeight }: NutrientAnaly
     { label: 'Ash', value: nutrients.ash, color: '#6b7280' },
     { label: 'Moisture', value: nutrients.moisture, color: '#3b82f6' },
     { label: 'Carbohydrates', value: nutrients.carbohydrates, color: '#ef4444' }
-  ];
+  ].filter(nutrient => nutrient.value > 0); // Only show nutrients with values > 0
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
