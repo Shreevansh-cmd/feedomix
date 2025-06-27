@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,12 +8,50 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { SelectedInputs } from '@/pages/Index';
 import { birdTypes } from '@/data/feedData';
 import { Download, Scale, Target } from 'lucide-react';
+import { NutrientAnalysis } from '@/components/NutrientAnalysis';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface FeedPlanResultsProps {
   selectedInputs: SelectedInputs;
 }
 
+interface IngredientData {
+  id: string;
+  name: string;
+  protein_percentage: number;
+  fat_percentage: number;
+  fiber_percentage: number;
+  ash_percentage: number;
+  moisture_percentage: number;
+  energy_kcal_per_kg: number;
+}
+
 export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
+  const { toast } = useToast();
+  const [ingredientsData, setIngredientsData] = useState<IngredientData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchIngredientsData();
+  }, [selectedInputs.selectedIngredients]);
+
+  const fetchIngredientsData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('feed_ingredients')
+        .select('*')
+        .in('name', selectedInputs.selectedIngredients);
+
+      if (error) throw error;
+      setIngredientsData(data || []);
+    } catch (error) {
+      console.error('Error fetching ingredients data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const selectedBird = birdTypes.find(bird => bird.id === selectedInputs.birdType);
   const selectedPhase = selectedBird?.phases.find(phase => phase.id === selectedInputs.phase);
   
@@ -32,12 +71,19 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
     return availableFromFormula.map(([ingredient, formulaWeight]) => {
       const proportion = formulaWeight / totalAvailableWeight;
       const dailyQuantity = totalDailyFeed * proportion;
+      const ingredientData = ingredientsData.find(ing => ing.name === ingredient);
       
       return {
         ingredient,
         quantity: dailyQuantity,
         unit: 'kg',
-        percentage: ((proportion * 100)).toFixed(1)
+        percentage: ((proportion * 100)).toFixed(1),
+        name: ingredient,
+        protein_percentage: ingredientData?.protein_percentage || 0,
+        fat_percentage: ingredientData?.fat_percentage || 0,
+        fiber_percentage: ingredientData?.fiber_percentage || 0,
+        ash_percentage: ingredientData?.ash_percentage || 0,
+        moisture_percentage: ingredientData?.moisture_percentage || 0
       };
     });
   };
@@ -52,10 +98,57 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
   }));
 
   const handleDownloadPDF = () => {
-    // In a real app, this would generate and download a PDF
-    console.log('Downloading PDF...', selectedInputs);
-    alert('PDF download feature would be implemented here!');
+    try {
+      // Create a comprehensive report text
+      const reportData = {
+        feedPlan: {
+          birdType: selectedBird?.name,
+          phase: selectedPhase?.name,
+          birdCount: selectedInputs.birdCount,
+          totalDailyFeed: totalDailyFeed.toFixed(1)
+        },
+        ingredients: ingredientQuantities,
+        nutritionalRequirements: {
+          protein: selectedPhase?.protein,
+          energy: selectedPhase?.energy,
+          ageRange: selectedPhase?.ageRange
+        }
+      };
+
+      // Convert to JSON string for download
+      const reportContent = JSON.stringify(reportData, null, 2);
+      const blob = new Blob([reportContent], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `feed-plan-${selectedBird?.name}-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Feed plan report downloaded successfully",
+      });
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download feed plan report",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-lg">Loading feed plan...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -138,6 +231,14 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
         </CardContent>
       </Card>
 
+      {/* Nutritional Analysis with Pie Chart */}
+      {ingredientQuantities.length > 0 && (
+        <NutrientAnalysis 
+          ingredients={ingredientQuantities}
+          totalFeedWeight={totalDailyFeed}
+        />
+      )}
+
       {/* Chart */}
       {chartData.length > 0 && (
         <Card className="shadow-lg border-purple-200">
@@ -180,7 +281,7 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
           size="lg"
         >
           <Download className="h-4 w-4 mr-2" />
-          Download Feed Plan (PDF)
+          Download Feed Plan Report
         </Button>
       </div>
     </div>
