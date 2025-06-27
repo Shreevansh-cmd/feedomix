@@ -32,6 +32,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
         return;
       }
 
+      // Check admin_users table for other admins
       const { data, error } = await supabase
         .from('admin_users')
         .select('id')
@@ -40,6 +41,8 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
 
       if (!error && data) {
         setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
       }
     } catch (error) {
       console.error('Error checking admin status:', error);

@@ -32,6 +32,13 @@ export const AdminDashboard = () => {
 
   const checkAdminStatus = async () => {
     try {
+      // Check if this is the predefined admin email
+      if (user?.email === 'whiteshadow1136@gmail.com') {
+        setIsAdmin(true);
+        return;
+      }
+
+      // Check admin_users table for other admins
       const { data, error } = await supabase
         .from('admin_users')
         .select('id')
@@ -40,26 +47,44 @@ export const AdminDashboard = () => {
 
       if (!error && data) {
         setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
       }
     } catch (error) {
       console.error('Error checking admin status:', error);
+      setIsAdmin(false);
     }
   };
 
   const fetchPendingUsers = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_pending_users');
-      
-      if (error) {
-        if (error.message.includes('Only admins can view pending users')) {
-          setIsAdmin(false);
-          return;
+      // Check if this is the predefined admin email
+      if (user?.email === 'whiteshadow1136@gmail.com') {
+        // Fetch pending users directly for predefined admin
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, email, full_name, created_at')
+          .eq('user_status', 'pending')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setPendingUsers(data || []);
+        setIsAdmin(true);
+      } else {
+        // Use the RPC function for other admins
+        const { data, error } = await supabase.rpc('get_pending_users');
+        
+        if (error) {
+          if (error.message.includes('Only admins can view pending users')) {
+            setIsAdmin(false);
+            return;
+          }
+          throw error;
         }
-        throw error;
+        
+        setPendingUsers(data || []);
+        setIsAdmin(true);
       }
-      
-      setPendingUsers(data || []);
-      setIsAdmin(true);
     } catch (error) {
       console.error('Error fetching pending users:', error);
       setIsAdmin(false);
@@ -70,9 +95,20 @@ export const AdminDashboard = () => {
 
   const approveUser = async (userId: string) => {
     try {
-      const { error } = await supabase.rpc('approve_user', { target_user_id: userId });
-      
-      if (error) throw error;
+      // Check if this is the predefined admin email
+      if (user?.email === 'whiteshadow1136@gmail.com') {
+        // Direct update for predefined admin
+        const { error } = await supabase
+          .from('profiles')
+          .update({ user_status: 'active', updated_at: new Date().toISOString() })
+          .eq('id', userId);
+
+        if (error) throw error;
+      } else {
+        // Use RPC function for other admins
+        const { error } = await supabase.rpc('approve_user', { target_user_id: userId });
+        if (error) throw error;
+      }
 
       toast({
         title: "Success",

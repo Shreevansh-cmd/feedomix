@@ -18,8 +18,9 @@ const defaultIngredients: Array<{
   calcium_percentage: number;
   phosphorus_percentage: number;
 }> = [
+  // Energy Sources
   { 
-    name: 'Maize', 
+    name: 'Maize (Corn)', 
     category: 'Energy Sources',
     protein_percentage: 8.5, 
     energy_kcal_per_kg: 3350, 
@@ -31,16 +32,16 @@ const defaultIngredients: Array<{
     phosphorus_percentage: 0.28
   },
   { 
-    name: 'Soya DOC', 
-    category: 'Protein Sources',
-    protein_percentage: 44.0, 
-    energy_kcal_per_kg: 2230, 
-    fat_percentage: 0.8, 
-    fiber_percentage: 7.0, 
-    moisture_percentage: 12.0, 
-    ash_percentage: 6.5,
-    calcium_percentage: 0.27,
-    phosphorus_percentage: 0.65
+    name: 'Wheat', 
+    category: 'Energy Sources',
+    protein_percentage: 11.5, 
+    energy_kcal_per_kg: 3200, 
+    fat_percentage: 1.8, 
+    fiber_percentage: 2.8, 
+    moisture_percentage: 13.0, 
+    ash_percentage: 1.8,
+    calcium_percentage: 0.05,
+    phosphorus_percentage: 0.35
   },
   { 
     name: 'Rice Bran', 
@@ -67,17 +68,105 @@ const defaultIngredients: Array<{
     phosphorus_percentage: 0.0
   },
   { 
-    name: 'DCP', 
-    category: 'Minerals',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 8.0, 
-    ash_percentage: 95.0,
-    calcium_percentage: 18.0,
-    phosphorus_percentage: 21.0
+    name: 'Barley', 
+    category: 'Energy Sources',
+    protein_percentage: 10.5, 
+    energy_kcal_per_kg: 2900, 
+    fat_percentage: 1.8, 
+    fiber_percentage: 5.5, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 2.8,
+    calcium_percentage: 0.06,
+    phosphorus_percentage: 0.34
   },
+  { 
+    name: 'Sorghum', 
+    category: 'Energy Sources',
+    protein_percentage: 9.2, 
+    energy_kcal_per_kg: 3200, 
+    fat_percentage: 2.8, 
+    fiber_percentage: 2.5, 
+    moisture_percentage: 13.0, 
+    ash_percentage: 1.6,
+    calcium_percentage: 0.03,
+    phosphorus_percentage: 0.28
+  },
+
+  // Protein Sources
+  { 
+    name: 'Soybean Meal (44% CP)', 
+    category: 'Protein Sources',
+    protein_percentage: 44.0, 
+    energy_kcal_per_kg: 2230, 
+    fat_percentage: 0.8, 
+    fiber_percentage: 7.0, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 6.5,
+    calcium_percentage: 0.27,
+    phosphorus_percentage: 0.65
+  },
+  { 
+    name: 'Fish Meal (65% CP)', 
+    category: 'Protein Sources',
+    protein_percentage: 65.0, 
+    energy_kcal_per_kg: 2800, 
+    fat_percentage: 8.5, 
+    fiber_percentage: 1.0, 
+    moisture_percentage: 10.0, 
+    ash_percentage: 15.0,
+    calcium_percentage: 3.8,
+    phosphorus_percentage: 2.4
+  },
+  { 
+    name: 'Groundnut Cake', 
+    category: 'Protein Sources',
+    protein_percentage: 45.0, 
+    energy_kcal_per_kg: 2400, 
+    fat_percentage: 8.0, 
+    fiber_percentage: 12.0, 
+    moisture_percentage: 10.0, 
+    ash_percentage: 5.5,
+    calcium_percentage: 0.15,
+    phosphorus_percentage: 0.58
+  },
+  { 
+    name: 'Sunflower Seed Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 38.0, 
+    energy_kcal_per_kg: 2100, 
+    fat_percentage: 1.5, 
+    fiber_percentage: 22.0, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 7.2,
+    calcium_percentage: 0.35,
+    phosphorus_percentage: 1.1
+  },
+  { 
+    name: 'Meat and Bone Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 50.0, 
+    energy_kcal_per_kg: 2200, 
+    fat_percentage: 10.0, 
+    fiber_percentage: 2.5, 
+    moisture_percentage: 8.0, 
+    ash_percentage: 28.0,
+    calcium_percentage: 8.5,
+    phosphorus_percentage: 4.2
+  },
+  { 
+    name: 'Canola Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 36.0, 
+    energy_kcal_per_kg: 2000, 
+    fat_percentage: 3.5, 
+    fiber_percentage: 12.0, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 7.5,
+    calcium_percentage: 0.65,
+    phosphorus_percentage: 1.0
+  },
+
+  // Minerals
   { 
     name: 'Limestone Powder', 
     category: 'Minerals',
@@ -91,7 +180,19 @@ const defaultIngredients: Array<{
     phosphorus_percentage: 0.02
   },
   { 
-    name: 'Salt', 
+    name: 'Dicalcium Phosphate (DCP)', 
+    category: 'Minerals',
+    protein_percentage: 0.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 8.0, 
+    ash_percentage: 95.0,
+    calcium_percentage: 18.0,
+    phosphorus_percentage: 21.0
+  },
+  { 
+    name: 'Salt (Sodium Chloride)', 
     category: 'Minerals',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
@@ -103,7 +204,21 @@ const defaultIngredients: Array<{
     phosphorus_percentage: 0.0
   },
   { 
-    name: 'Broiler Premix', 
+    name: 'Oyster Shell', 
+    category: 'Minerals',
+    protein_percentage: 0.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 1.5, 
+    ash_percentage: 96.0,
+    calcium_percentage: 36.0,
+    phosphorus_percentage: 0.01
+  },
+
+  // Additives
+  { 
+    name: 'Broiler Vitamin Premix', 
     category: 'Additives',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
@@ -115,7 +230,7 @@ const defaultIngredients: Array<{
     phosphorus_percentage: 0.0
   },
   { 
-    name: 'Layer Premix', 
+    name: 'Layer Vitamin Premix', 
     category: 'Additives',
     protein_percentage: 0.0, 
     energy_kcal_per_kg: 0, 
@@ -147,6 +262,30 @@ const defaultIngredients: Array<{
     fiber_percentage: 0.0, 
     moisture_percentage: 5.0, 
     ash_percentage: 90.0,
+    calcium_percentage: 0.0,
+    phosphorus_percentage: 0.0
+  },
+  { 
+    name: 'Enzyme Complex', 
+    category: 'Additives',
+    protein_percentage: 0.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 8.0, 
+    ash_percentage: 85.0,
+    calcium_percentage: 0.0,
+    phosphorus_percentage: 0.0
+  },
+  { 
+    name: 'Probiotic', 
+    category: 'Additives',
+    protein_percentage: 0.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 6.0, 
+    ash_percentage: 88.0,
     calcium_percentage: 0.0,
     phosphorus_percentage: 0.0
   },

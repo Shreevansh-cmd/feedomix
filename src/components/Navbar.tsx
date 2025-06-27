@@ -24,6 +24,7 @@ export const Navbar = () => {
         return;
       }
 
+      // Check admin_users table for other admins
       const { data, error } = await supabase
         .from('admin_users')
         .select('id')
@@ -32,6 +33,8 @@ export const Navbar = () => {
 
       if (!error && data) {
         setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
       }
     } catch (error) {
       // User is not admin, which is fine
@@ -52,7 +55,7 @@ export const Navbar = () => {
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <User className="h-4 w-4" />
                 <span>{user.email}</span>
-                {user.email === 'whiteshadow1136@gmail.com' && (
+                {isAdmin && (
                   <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full ml-2">
                     Admin
                   </span>
