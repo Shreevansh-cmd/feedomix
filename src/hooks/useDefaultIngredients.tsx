@@ -261,42 +261,6 @@ const defaultIngredients: Array<{
     calcium_percentage: 0.35,
     phosphorus_percentage: 0.25
   },
-  { 
-    name: 'Feather Meal', 
-    category: 'Protein Sources',
-    protein_percentage: 85.0, 
-    energy_kcal_per_kg: 2400, 
-    fat_percentage: 7.0, 
-    fiber_percentage: 1.5, 
-    moisture_percentage: 8.0, 
-    ash_percentage: 3.0,
-    calcium_percentage: 0.4,
-    phosphorus_percentage: 0.7
-  },
-  { 
-    name: 'Poultry By-Product Meal', 
-    category: 'Protein Sources',
-    protein_percentage: 58.0, 
-    energy_kcal_per_kg: 2500, 
-    fat_percentage: 12.0, 
-    fiber_percentage: 2.5, 
-    moisture_percentage: 10.0, 
-    ash_percentage: 14.0,
-    calcium_percentage: 2.2,
-    phosphorus_percentage: 1.8
-  },
-  { 
-    name: 'Sesame Meal', 
-    category: 'Protein Sources',
-    protein_percentage: 35.0, 
-    energy_kcal_per_kg: 1900, 
-    fat_percentage: 6.0, 
-    fiber_percentage: 18.0, 
-    moisture_percentage: 12.0, 
-    ash_percentage: 13.5,
-    calcium_percentage: 2.1,
-    phosphorus_percentage: 1.1
-  },
 
   // Minerals
   { 
@@ -359,18 +323,6 @@ const defaultIngredients: Array<{
     calcium_percentage: 24.0,
     phosphorus_percentage: 12.0
   },
-  { 
-    name: 'Rock Phosphate', 
-    category: 'Minerals',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 3.0, 
-    ash_percentage: 95.0,
-    calcium_percentage: 32.0,
-    phosphorus_percentage: 14.5
-  },
 
   // Additives
   { 
@@ -398,54 +350,6 @@ const defaultIngredients: Array<{
     phosphorus_percentage: 0.0
   },
   { 
-    name: 'Toxin Binder', 
-    category: 'Additives',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 12.0, 
-    ash_percentage: 85.0,
-    calcium_percentage: 0.0,
-    phosphorus_percentage: 0.0
-  },
-  { 
-    name: 'Coccidiostat', 
-    category: 'Additives',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 5.0, 
-    ash_percentage: 90.0,
-    calcium_percentage: 0.0,
-    phosphorus_percentage: 0.0
-  },
-  { 
-    name: 'Enzyme Complex', 
-    category: 'Additives',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 8.0, 
-    ash_percentage: 85.0,
-    calcium_percentage: 0.0,
-    phosphorus_percentage: 0.0
-  },
-  { 
-    name: 'Probiotic', 
-    category: 'Additives',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 6.0, 
-    ash_percentage: 88.0,
-    calcium_percentage: 0.0,
-    phosphorus_percentage: 0.0
-  },
-  { 
     name: 'Lysine HCL', 
     category: 'Additives',
     protein_percentage: 78.0, 
@@ -469,30 +373,6 @@ const defaultIngredients: Array<{
     calcium_percentage: 0.0,
     phosphorus_percentage: 0.0
   },
-  { 
-    name: 'Choline Chloride', 
-    category: 'Additives',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 2.0, 
-    ash_percentage: 95.0,
-    calcium_percentage: 0.0,
-    phosphorus_percentage: 0.0
-  },
-  { 
-    name: 'Antioxidant (BHT)', 
-    category: 'Additives',
-    protein_percentage: 0.0, 
-    energy_kcal_per_kg: 0, 
-    fat_percentage: 0.0, 
-    fiber_percentage: 0.0, 
-    moisture_percentage: 0.5, 
-    ash_percentage: 99.0,
-    calcium_percentage: 0.0,
-    phosphorus_percentage: 0.0
-  },
 ];
 
 export const useDefaultIngredients = () => {
@@ -503,18 +383,28 @@ export const useDefaultIngredients = () => {
       if (!user) return;
 
       try {
+        console.log('Checking for existing default ingredients for user:', user.id);
+        
         // Check if default ingredients already exist for this user
-        const { data: existingDefaults } = await supabase
+        const { data: existingDefaults, error: checkError } = await supabase
           .from('feed_ingredients')
           .select('id')
           .eq('is_default', true)
           .eq('user_id', user.id)
           .limit(1);
 
+        if (checkError) {
+          console.error('Error checking existing ingredients:', checkError);
+          return;
+        }
+
         if (existingDefaults && existingDefaults.length > 0) {
+          console.log('Default ingredients already exist, skipping insertion');
           return; // Default ingredients already exist for this user
         }
 
+        console.log('Inserting default ingredients...');
+        
         // Insert default ingredients with current user's ID
         const ingredientsToInsert = defaultIngredients.map(ingredient => ({
           ...ingredient,
