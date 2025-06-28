@@ -91,6 +91,54 @@ const defaultIngredients: Array<{
     calcium_percentage: 0.03,
     phosphorus_percentage: 0.28
   },
+  { 
+    name: 'Millet', 
+    category: 'Energy Sources',
+    protein_percentage: 11.0, 
+    energy_kcal_per_kg: 3100, 
+    fat_percentage: 4.2, 
+    fiber_percentage: 8.5, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 3.3,
+    calcium_percentage: 0.13,
+    phosphorus_percentage: 0.28
+  },
+  { 
+    name: 'Oats', 
+    category: 'Energy Sources',
+    protein_percentage: 10.6, 
+    energy_kcal_per_kg: 2800, 
+    fat_percentage: 4.6, 
+    fiber_percentage: 10.6, 
+    moisture_percentage: 13.0, 
+    ash_percentage: 3.0,
+    calcium_percentage: 0.08,
+    phosphorus_percentage: 0.31
+  },
+  { 
+    name: 'Broken Rice', 
+    category: 'Energy Sources',
+    protein_percentage: 7.5, 
+    energy_kcal_per_kg: 3300, 
+    fat_percentage: 0.5, 
+    fiber_percentage: 0.4, 
+    moisture_percentage: 13.0, 
+    ash_percentage: 0.6,
+    calcium_percentage: 0.01,
+    phosphorus_percentage: 0.11
+  },
+  { 
+    name: 'Cassava Meal', 
+    category: 'Energy Sources',
+    protein_percentage: 2.0, 
+    energy_kcal_per_kg: 3100, 
+    fat_percentage: 0.3, 
+    fiber_percentage: 2.0, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 2.2,
+    calcium_percentage: 0.16,
+    phosphorus_percentage: 0.06
+  },
 
   // Protein Sources
   { 
@@ -106,6 +154,18 @@ const defaultIngredients: Array<{
     phosphorus_percentage: 0.65
   },
   { 
+    name: 'Soybean Meal (48% CP)', 
+    category: 'Protein Sources',
+    protein_percentage: 48.0, 
+    energy_kcal_per_kg: 2200, 
+    fat_percentage: 0.5, 
+    fiber_percentage: 3.9, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 6.2,
+    calcium_percentage: 0.29,
+    phosphorus_percentage: 0.71
+  },
+  { 
     name: 'Fish Meal (65% CP)', 
     category: 'Protein Sources',
     protein_percentage: 65.0, 
@@ -116,6 +176,18 @@ const defaultIngredients: Array<{
     ash_percentage: 15.0,
     calcium_percentage: 3.8,
     phosphorus_percentage: 2.4
+  },
+  { 
+    name: 'Fish Meal (60% CP)', 
+    category: 'Protein Sources',
+    protein_percentage: 60.0, 
+    energy_kcal_per_kg: 2650, 
+    fat_percentage: 9.0, 
+    fiber_percentage: 1.2, 
+    moisture_percentage: 10.0, 
+    ash_percentage: 16.0,
+    calcium_percentage: 4.0,
+    phosphorus_percentage: 2.2
   },
   { 
     name: 'Groundnut Cake', 
@@ -164,6 +236,66 @@ const defaultIngredients: Array<{
     ash_percentage: 7.5,
     calcium_percentage: 0.65,
     phosphorus_percentage: 1.0
+  },
+  { 
+    name: 'Cotton Seed Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 41.0, 
+    energy_kcal_per_kg: 2100, 
+    fat_percentage: 1.5, 
+    fiber_percentage: 13.0, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 6.8,
+    calcium_percentage: 0.17,
+    phosphorus_percentage: 1.2
+  },
+  { 
+    name: 'Blood Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 80.0, 
+    energy_kcal_per_kg: 2600, 
+    fat_percentage: 1.0, 
+    fiber_percentage: 1.0, 
+    moisture_percentage: 8.0, 
+    ash_percentage: 4.5,
+    calcium_percentage: 0.35,
+    phosphorus_percentage: 0.25
+  },
+  { 
+    name: 'Feather Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 85.0, 
+    energy_kcal_per_kg: 2400, 
+    fat_percentage: 7.0, 
+    fiber_percentage: 1.5, 
+    moisture_percentage: 8.0, 
+    ash_percentage: 3.0,
+    calcium_percentage: 0.4,
+    phosphorus_percentage: 0.7
+  },
+  { 
+    name: 'Poultry By-Product Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 58.0, 
+    energy_kcal_per_kg: 2500, 
+    fat_percentage: 12.0, 
+    fiber_percentage: 2.5, 
+    moisture_percentage: 10.0, 
+    ash_percentage: 14.0,
+    calcium_percentage: 2.2,
+    phosphorus_percentage: 1.8
+  },
+  { 
+    name: 'Sesame Meal', 
+    category: 'Protein Sources',
+    protein_percentage: 35.0, 
+    energy_kcal_per_kg: 1900, 
+    fat_percentage: 6.0, 
+    fiber_percentage: 18.0, 
+    moisture_percentage: 12.0, 
+    ash_percentage: 13.5,
+    calcium_percentage: 2.1,
+    phosphorus_percentage: 1.1
   },
 
   // Minerals
@@ -214,6 +346,30 @@ const defaultIngredients: Array<{
     ash_percentage: 96.0,
     calcium_percentage: 36.0,
     phosphorus_percentage: 0.01
+  },
+  { 
+    name: 'Bone Meal', 
+    category: 'Minerals',
+    protein_percentage: 4.0, 
+    energy_kcal_per_kg: 500, 
+    fat_percentage: 2.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 6.0, 
+    ash_percentage: 85.0,
+    calcium_percentage: 24.0,
+    phosphorus_percentage: 12.0
+  },
+  { 
+    name: 'Rock Phosphate', 
+    category: 'Minerals',
+    protein_percentage: 0.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 3.0, 
+    ash_percentage: 95.0,
+    calcium_percentage: 32.0,
+    phosphorus_percentage: 14.5
   },
 
   // Additives
@@ -286,6 +442,54 @@ const defaultIngredients: Array<{
     fiber_percentage: 0.0, 
     moisture_percentage: 6.0, 
     ash_percentage: 88.0,
+    calcium_percentage: 0.0,
+    phosphorus_percentage: 0.0
+  },
+  { 
+    name: 'Lysine HCL', 
+    category: 'Additives',
+    protein_percentage: 78.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 1.0, 
+    ash_percentage: 20.0,
+    calcium_percentage: 0.0,
+    phosphorus_percentage: 0.0
+  },
+  { 
+    name: 'DL-Methionine', 
+    category: 'Additives',
+    protein_percentage: 59.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 0.3, 
+    ash_percentage: 0.1,
+    calcium_percentage: 0.0,
+    phosphorus_percentage: 0.0
+  },
+  { 
+    name: 'Choline Chloride', 
+    category: 'Additives',
+    protein_percentage: 0.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 2.0, 
+    ash_percentage: 95.0,
+    calcium_percentage: 0.0,
+    phosphorus_percentage: 0.0
+  },
+  { 
+    name: 'Antioxidant (BHT)', 
+    category: 'Additives',
+    protein_percentage: 0.0, 
+    energy_kcal_per_kg: 0, 
+    fat_percentage: 0.0, 
+    fiber_percentage: 0.0, 
+    moisture_percentage: 0.5, 
+    ash_percentage: 99.0,
     calcium_percentage: 0.0,
     phosphorus_percentage: 0.0
   },
