@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { BirdTypeSelector } from '@/components/BirdTypeSelector';
 import { PhaseSelector } from '@/components/PhaseSelector';
@@ -35,7 +36,10 @@ export interface SelectedInputs {
 }
 
 const Index = () => {
-  useDefaultIngredients(); // Initialize default ingredients
+  console.log('Index page rendering...');
+  
+  // Initialize default ingredients when user accesses the main page
+  useDefaultIngredients();
 
   const [selectedInputs, setSelectedInputs] = useState<SelectedInputs>({
     birdType: '',

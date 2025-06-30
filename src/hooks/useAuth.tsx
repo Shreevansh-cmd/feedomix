@@ -2,7 +2,6 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useDefaultIngredients } from '@/hooks/useDefaultIngredients';
 
 interface AuthContextType {
   user: User | null;
@@ -19,9 +18,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Initialize default ingredients when user is authenticated
-  useDefaultIngredients();
 
   useEffect(() => {
     console.log('Setting up auth state listener...');
