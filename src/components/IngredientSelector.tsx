@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 
 interface Ingredient {
   id: string;
@@ -38,7 +38,12 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
   const { data: ingredients, isLoading, error } = useQuery({
     queryKey: ['ingredients', user?.id],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user) {
+        console.log('No user found, cannot fetch ingredients');
+        return [];
+      }
+      
+      console.log('Fetching ingredients for user:', user.id);
       
       const { data, error } = await supabase
         .from('feed_ingredients')
@@ -47,19 +52,40 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
         .order('category', { ascending: true })
         .order('name', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching ingredients:', error);
+        throw error;
+      }
+      
+      console.log('Fetched ingredients:', data);
       return data as Ingredient[];
     },
     enabled: !!user,
   });
 
   const handleIngredientToggle = (ingredientId: string) => {
+    console.log('Toggling ingredient:', ingredientId);
     const newSelected = selectedIngredients.includes(ingredientId)
       ? selectedIngredients.filter(id => id !== ingredientId)
       : [...selectedIngredients, ingredientId];
     
+    console.log('New selected ingredients:', newSelected);
     onIngredientsChange(newSelected);
   };
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Available Ingredients</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-8">
+          <AlertCircle className="h-6 w-6 text-yellow-500 mr-2" />
+          <span>Please sign in to view ingredients</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -81,22 +107,47 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
         <CardHeader>
           <CardTitle>Available Ingredients</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-red-600">Error loading ingredients: {error.message}</p>
+        <CardContent className="flex items-center justify-center py-8">
+          <AlertCircle className="h-6 w-6 text-red-500 mr-2" />
+          <div className="text-center">
+            <p className="text-red-600">Error loading ingredients</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {error instanceof Error ? error.message : 'Unknown error occurred'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!ingredients || ingredients.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Available Ingredients</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 text-lg">No ingredients found</p>
+            <p className="text-sm text-gray-500 mt-1">
+              Default ingredients are being loaded. Please refresh the page in a moment.
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   // Group ingredients by category
-  const groupedIngredients = ingredients?.reduce((acc, ingredient) => {
+  const groupedIngredients = ingredients.reduce((acc, ingredient) => {
     const category = ingredient.category || 'Other';
     if (!acc[category]) {
       acc[category] = [];
     }
     acc[category].push(ingredient);
     return acc;
-  }, {} as Record<string, Ingredient[]>) || {};
+  }, {} as Record<string, Ingredient[]>);
 
   // Define category order
   const categoryOrder = ['Energy Sources', 'Protein Sources', 'Minerals', 'Additives', 'Other'];
@@ -116,7 +167,7 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
       <CardHeader>
         <CardTitle>Available Ingredients</CardTitle>
         <p className="text-sm text-gray-600">
-          Select ingredients to include in your feed formulation
+          Select ingredients to include in your feed formulation ({ingredients.length} available)
         </p>
       </CardHeader>
       <CardContent>

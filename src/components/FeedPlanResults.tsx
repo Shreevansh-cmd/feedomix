@@ -11,6 +11,7 @@ import { Download, Scale, Target } from 'lucide-react';
 import { NutrientAnalysis } from '@/components/NutrientAnalysis';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface FeedPlanResultsProps {
   selectedInputs: SelectedInputs;
@@ -29,24 +30,42 @@ interface IngredientData {
 
 export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [ingredientsData, setIngredientsData] = useState<IngredientData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchIngredientsData();
-  }, [selectedInputs.selectedIngredients]);
+    if (user && selectedInputs.selectedIngredients.length > 0) {
+      fetchIngredientsData();
+    } else {
+      setLoading(false);
+    }
+  }, [selectedInputs.selectedIngredients, user]);
 
   const fetchIngredientsData = async () => {
     try {
+      console.log('Fetching ingredients data for IDs:', selectedInputs.selectedIngredients);
+      
       const { data, error } = await supabase
         .from('feed_ingredients')
         .select('*')
-        .in('name', selectedInputs.selectedIngredients);
+        .in('id', selectedInputs.selectedIngredients)
+        .eq('user_id', user?.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching ingredients:', error);
+        throw error;
+      }
+      
+      console.log('Fetched ingredients data:', data);
       setIngredientsData(data || []);
     } catch (error) {
       console.error('Error fetching ingredients data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load ingredients data",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -59,31 +78,28 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
   const dailyFeedPerBird = selectedInputs.birdType === 'broiler' ? 120 : 130; // grams
   const totalDailyFeed = (selectedInputs.birdCount * dailyFeedPerBird) / 1000; // kg
   
-  // Calculate ingredient proportions based on formula and available ingredients
+  // Calculate ingredient proportions based on available ingredients
   const getIngredientQuantities = () => {
-    if (!selectedPhase?.formula) return [];
+    if (ingredientsData.length === 0) return [];
     
-    const availableFromFormula = Object.entries(selectedPhase.formula)
-      .filter(([ingredient]) => selectedInputs.selectedIngredients.includes(ingredient));
+    // For simplicity, distribute equally among selected ingredients
+    // In a real application, this would use proper feed formulation algorithms
+    const equalProportion = 1 / ingredientsData.length;
     
-    const totalAvailableWeight = availableFromFormula.reduce((sum, [, weight]) => sum + weight, 0);
-    
-    return availableFromFormula.map(([ingredient, formulaWeight]) => {
-      const proportion = formulaWeight / totalAvailableWeight;
-      const dailyQuantity = totalDailyFeed * proportion;
-      const ingredientData = ingredientsData.find(ing => ing.name === ingredient);
+    return ingredientsData.map((ingredient) => {
+      const dailyQuantity = totalDailyFeed * equalProportion;
       
       return {
-        ingredient,
+        ingredient: ingredient.name,
         quantity: dailyQuantity,
         unit: 'kg',
-        percentage: ((proportion * 100)).toFixed(1),
-        name: ingredient,
-        protein_percentage: Number(ingredientData?.protein_percentage) || 0,
-        fat_percentage: Number(ingredientData?.fat_percentage) || 0,
-        fiber_percentage: Number(ingredientData?.fiber_percentage) || 0,
-        ash_percentage: Number(ingredientData?.ash_percentage) || 0,
-        moisture_percentage: Number(ingredientData?.moisture_percentage) || 0
+        percentage: ((equalProportion * 100)).toFixed(1),
+        name: ingredient.name,
+        protein_percentage: Number(ingredient.protein_percentage) || 0,
+        fat_percentage: Number(ingredient.fat_percentage) || 0,
+        fiber_percentage: Number(ingredient.fiber_percentage) || 0,
+        ash_percentage: Number(ingredient.ash_percentage) || 0,
+        moisture_percentage: Number(ingredient.moisture_percentage) || 0
       };
     });
   };
@@ -154,9 +170,32 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <div className="text-lg">Loading feed plan...</div>
-      </div>
+      <Card className="shadow-lg border-blue-200">
+        <CardHeader className="bg-blue-100">
+          <CardTitle className="text-blue-800">Feed Plan Results</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="text-center py-8">
+            <div className="text-lg">Loading feed plan...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!selectedBird || !selectedPhase) {
+    return (
+      <Card className="shadow-lg border-blue-200">
+        <CardHeader className="bg-blue-100">
+          <CardTitle className="text-blue-800">Feed Plan Results</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="text-center py-12 text-gray-500">
+            <div className="text-6xl mb-4">🐔</div>
+            <p className="text-lg">Please select bird type and phase to continue</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -234,8 +273,8 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
 
           {ingredientQuantities.length === 0 && (
             <div className="text-center py-8 text-gray-500">
-              <p>No matching ingredients found in the formula.</p>
-              <p className="text-sm mt-1">Try selecting different ingredients or phase.</p>
+              <p>No ingredients selected.</p>
+              <p className="text-sm mt-1">Please select ingredients to see the feed plan.</p>
             </div>
           )}
         </CardContent>
@@ -284,16 +323,18 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
       )}
 
       {/* Download Button */}
-      <div className="text-center">
-        <Button 
-          onClick={handleDownloadPDF}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
-          size="lg"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Download Feed Plan Report
-        </Button>
-      </div>
+      {ingredientQuantities.length > 0 && (
+        <div className="text-center">
+          <Button 
+            onClick={handleDownloadPDF}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
+            size="lg"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download Feed Plan Report
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
