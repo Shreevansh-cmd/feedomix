@@ -10,7 +10,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, EyeOff } from 'lucide-react';
 
+console.log('Auth page loading...');
+
 const Auth = () => {
+  console.log('Auth component rendering...');
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -22,20 +26,32 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Sign up attempt for:', email);
     setLoading(true);
     
-    const { error } = await signUp(email, password, fullName);
-    
-    if (error) {
+    try {
+      const { error } = await signUp(email, password, fullName);
+      
+      if (error) {
+        console.error('Sign up error:', error);
+        toast({
+          title: "Sign up failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log('Sign up successful');
+        toast({
+          title: "Sign up successful!",
+          description: "Please check your email to confirm your account.",
+        });
+      }
+    } catch (error) {
+      console.error('Sign up exception:', error);
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: "An unexpected error occurred",
         variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Sign up successful!",
-        description: "Please check your email to confirm your account.",
       });
     }
     setLoading(false);
@@ -43,22 +59,34 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Sign in attempt for:', email);
     setLoading(true);
     
-    const { error } = await signIn(email, password);
-    
-    if (error) {
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        console.error('Sign in error:', error);
+        toast({
+          title: "Sign in failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log('Sign in successful');
+        toast({
+          title: "Welcome back!",
+          description: "You have been signed in successfully.",
+        });
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Sign in exception:', error);
       toast({
         title: "Sign in failed",
-        description: error.message,
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Welcome back!",
-        description: "You have been signed in successfully.",
-      });
-      navigate('/');
     }
     setLoading(false);
   };
