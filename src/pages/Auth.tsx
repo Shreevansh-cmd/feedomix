@@ -95,7 +95,7 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl text-green-800">🐔 Poultry Feed Calculator</CardTitle>
+          <CardTitle className="text-2xl text-green-800">🥗 Feedomix</CardTitle>
           <CardDescription>Sign in to manage your feed plans</CardDescription>
         </CardHeader>
         <CardContent>

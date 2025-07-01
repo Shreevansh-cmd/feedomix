@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +14,7 @@ interface PendingUser {
   email: string;
   full_name: string;
   created_at: string;
+  user_status: string;
 }
 
 interface UserStats {
@@ -37,22 +39,27 @@ export const AdminDashboard = () => {
 
   const checkAdminStatusAndFetchData = async () => {
     try {
+      console.log('Checking admin status for user:', user?.email);
+      
       const isPredefinedAdmin = user?.email === 'whiteshadow1136@gmail.com';
       let adminStatus = false;
 
       if (isPredefinedAdmin) {
+        console.log('User is predefined admin');
         adminStatus = true;
       } else {
-        // Check admin_users table for other admins
+        console.log('Checking admin_users table');
         const { data, error } = await supabase
           .from('admin_users')
           .select('id')
           .eq('user_id', user?.id)
-          .single();
+          .maybeSingle();
 
+        console.log('Admin check result:', { data, error });
         adminStatus = !error && !!data;
       }
 
+      console.log('Final admin status:', adminStatus);
       setIsAdmin(adminStatus);
 
       if (adminStatus) {
@@ -68,17 +75,26 @@ export const AdminDashboard = () => {
 
   const fetchPendingUsers = async () => {
     try {
+      console.log('Fetching pending users...');
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, created_at')
+        .select('id, email, full_name, created_at, user_status')
         .eq('user_status', 'pending')
         .order('created_at', { ascending: false });
 
+      console.log('Pending users query result:', { data, error });
+
       if (error) {
         console.error('Error fetching pending users:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch pending users",
+          variant: "destructive",
+        });
         return;
       }
 
+      console.log('Setting pending users:', data);
       setPendingUsers(data || []);
     } catch (error) {
       console.error('Error fetching pending users:', error);
@@ -87,11 +103,18 @@ export const AdminDashboard = () => {
 
   const fetchUserStats = async () => {
     try {
+      console.log('Fetching user stats...');
       const [pendingResponse, totalResponse, activeResponse] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact' }).eq('user_status', 'pending'),
         supabase.from('profiles').select('id', { count: 'exact' }),
         supabase.from('profiles').select('id', { count: 'exact' }).eq('user_status', 'active')
       ]);
+
+      console.log('Stats query results:', {
+        pending: pendingResponse,
+        total: totalResponse,
+        active: activeResponse
+      });
 
       setStats({
         pendingCount: pendingResponse.count || 0,
@@ -105,6 +128,7 @@ export const AdminDashboard = () => {
 
   const approveUser = async (userId: string) => {
     try {
+      console.log('Approving user:', userId);
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -113,8 +137,12 @@ export const AdminDashboard = () => {
         })
         .eq('id', userId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error approving user:', error);
+        throw error;
+      }
 
+      console.log('User approved successfully');
       toast({
         title: "Success",
         description: "User approved successfully",
@@ -211,7 +239,7 @@ export const AdminDashboard = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            Pending User Approvals
+            Pending User Approvals ({pendingUsers.length})
           </CardTitle>
           <CardDescription>
             Review and approve new user registrations
@@ -247,7 +275,7 @@ export const AdminDashboard = () => {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-                        Pending
+                        {user.user_status}
                       </Badge>
                     </TableCell>
                     <TableCell>

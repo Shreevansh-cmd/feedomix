@@ -29,7 +29,7 @@ export const Navbar = () => {
         .from('admin_users')
         .select('id')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         setIsAdmin(true);
@@ -46,7 +46,7 @@ export const Navbar = () => {
     <nav className="bg-white shadow-sm border-b border-green-200">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link to="/" className="text-xl font-bold text-green-800">
-          🐔 Poultry Feed Calculator
+          🥗 Feedomix
         </Link>
         
         <div className="flex items-center gap-4">
