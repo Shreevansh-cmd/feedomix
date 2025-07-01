@@ -91,7 +91,7 @@ export type Database = {
           full_name: string | null
           id: string
           updated_at: string
-          user_status: Database["public"]["Enums"]["user_status"] | null
+          user_status: Database["public"]["Enums"]["user_status"]
         }
         Insert: {
           created_at?: string
@@ -99,7 +99,7 @@ export type Database = {
           full_name?: string | null
           id: string
           updated_at?: string
-          user_status?: Database["public"]["Enums"]["user_status"] | null
+          user_status?: Database["public"]["Enums"]["user_status"]
         }
         Update: {
           created_at?: string
@@ -107,7 +107,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
-          user_status?: Database["public"]["Enums"]["user_status"] | null
+          user_status?: Database["public"]["Enums"]["user_status"]
         }
         Relationships: []
       }
