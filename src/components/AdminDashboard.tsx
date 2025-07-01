@@ -16,107 +16,113 @@ interface PendingUser {
   created_at: string;
 }
 
+interface UserStats {
+  pendingCount: number;
+  totalCount: number;
+  activeCount: number;
+}
+
 export const AdminDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
+  const [stats, setStats] = useState<UserStats>({ pendingCount: 0, totalCount: 0, activeCount: 0 });
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (user) {
-      checkAdminStatus();
-      fetchPendingUsers();
+      checkAdminStatusAndFetchData();
     }
   }, [user]);
 
-  const checkAdminStatus = async () => {
+  const checkAdminStatusAndFetchData = async () => {
     try {
-      // Check if this is the predefined admin email
-      if (user?.email === 'whiteshadow1136@gmail.com') {
-        setIsAdmin(true);
-        return;
-      }
+      const isPredefinedAdmin = user?.email === 'whiteshadow1136@gmail.com';
+      let adminStatus = false;
 
-      // Check admin_users table for other admins
-      const { data, error } = await supabase
-        .from('admin_users')
-        .select('id')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (!error && data) {
-        setIsAdmin(true);
+      if (isPredefinedAdmin) {
+        adminStatus = true;
       } else {
-        setIsAdmin(false);
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
-    }
-  };
-
-  const fetchPendingUsers = async () => {
-    try {
-      // Check if this is the predefined admin email
-      if (user?.email === 'whiteshadow1136@gmail.com') {
-        // Fetch pending users directly for predefined admin
+        // Check admin_users table for other admins
         const { data, error } = await supabase
-          .from('profiles')
-          .select('id, email, full_name, created_at')
-          .eq('user_status', 'pending')
-          .order('created_at', { ascending: false });
+          .from('admin_users')
+          .select('id')
+          .eq('user_id', user?.id)
+          .single();
 
-        if (error) throw error;
-        setPendingUsers(data || []);
-        setIsAdmin(true);
-      } else {
-        // Use the RPC function for other admins
-        const { data, error } = await supabase.rpc('get_pending_users');
-        
-        if (error) {
-          if (error.message.includes('Only admins can view pending users')) {
-            setIsAdmin(false);
-            return;
-          }
-          throw error;
-        }
-        
-        setPendingUsers(data || []);
-        setIsAdmin(true);
+        adminStatus = !error && data;
+      }
+
+      setIsAdmin(adminStatus);
+
+      if (adminStatus) {
+        await Promise.all([fetchPendingUsers(), fetchUserStats()]);
       }
     } catch (error) {
-      console.error('Error fetching pending users:', error);
+      console.error('Error in admin check:', error);
       setIsAdmin(false);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchPendingUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, created_at')
+        .eq('user_status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching pending users:', error);
+        return;
+      }
+
+      setPendingUsers(data || []);
+    } catch (error) {
+      console.error('Error fetching pending users:', error);
+    }
+  };
+
+  const fetchUserStats = async () => {
+    try {
+      const [pendingResponse, totalResponse, activeResponse] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact' }).eq('user_status', 'pending'),
+        supabase.from('profiles').select('id', { count: 'exact' }),
+        supabase.from('profiles').select('id', { count: 'exact' }).eq('user_status', 'active')
+      ]);
+
+      setStats({
+        pendingCount: pendingResponse.count || 0,
+        totalCount: totalResponse.count || 0,
+        activeCount: activeResponse.count || 0
+      });
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    }
+  };
+
   const approveUser = async (userId: string) => {
     try {
-      // Check if this is the predefined admin email
-      if (user?.email === 'whiteshadow1136@gmail.com') {
-        // Direct update for predefined admin
-        const { error } = await supabase
-          .from('profiles')
-          .update({ user_status: 'active', updated_at: new Date().toISOString() })
-          .eq('id', userId);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          user_status: 'active', 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', userId);
 
-        if (error) throw error;
-      } else {
-        // Use RPC function for other admins
-        const { error } = await supabase.rpc('approve_user', { target_user_id: userId });
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "User approved successfully",
       });
 
-      // Refresh the pending users list
-      fetchPendingUsers();
+      // Refresh data
+      await Promise.all([fetchPendingUsers(), fetchUserStats()]);
     } catch (error) {
       console.error('Error approving user:', error);
       toast({
@@ -167,7 +173,7 @@ export const AdminDashboard = () => {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{pendingUsers.length}</div>
+            <div className="text-2xl font-bold text-orange-600">{stats.pendingCount}</div>
             <p className="text-xs text-muted-foreground">
               Awaiting approval
             </p>
@@ -180,7 +186,7 @@ export const AdminDashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">-</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.totalCount}</div>
             <p className="text-xs text-muted-foreground">
               All registered users
             </p>
@@ -193,7 +199,7 @@ export const AdminDashboard = () => {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">-</div>
+            <div className="text-2xl font-bold text-green-600">{stats.activeCount}</div>
             <p className="text-xs text-muted-foreground">
               Approved and active
             </p>
