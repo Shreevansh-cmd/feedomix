@@ -49,7 +49,7 @@ export const Navbar = () => {
           <img 
             src="/lovable-uploads/1c1aae96-4be3-4a3d-a676-075fa5697714.png" 
             alt="FeedoMix Logo" 
-            className="h-10 w-auto"
+            className="h-12 w-auto"
           />
         </Link>
         

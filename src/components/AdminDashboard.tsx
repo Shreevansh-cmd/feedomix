@@ -77,26 +77,10 @@ export const AdminDashboard = () => {
     try {
       console.log('Fetching pending users...');
       
-      // Use RPC function if available, otherwise direct query
-      let data, error;
-      
-      try {
-        const rpcResult = await supabase.rpc('get_pending_users');
-        data = rpcResult.data;
-        error = rpcResult.error;
-      } catch (rpcError) {
-        console.log('RPC function not available, using direct query');
-        const directResult = await supabase
-          .from('profiles')
-          .select('id, email, full_name, created_at, user_status')
-          .eq('user_status', 'pending')
-          .order('created_at', { ascending: false });
-        
-        data = directResult.data;
-        error = directResult.error;
-      }
+      // First try the RPC function
+      const { data, error } = await supabase.rpc('get_pending_users');
 
-      console.log('Pending users query result:', { data, error });
+      console.log('Pending users RPC result:', { data, error });
 
       if (error) {
         console.error('Error fetching pending users:', error);
@@ -149,24 +133,7 @@ export const AdminDashboard = () => {
     try {
       console.log('Approving user:', userId);
       
-      // Try RPC function first, fallback to direct update
-      let error;
-      
-      try {
-        const rpcResult = await supabase.rpc('approve_user', { target_user_id: userId });
-        error = rpcResult.error;
-      } catch (rpcError) {
-        console.log('RPC function not available, using direct update');
-        const updateResult = await supabase
-          .from('profiles')
-          .update({ 
-            user_status: 'active', 
-            updated_at: new Date().toISOString() 
-          })
-          .eq('id', userId);
-        
-        error = updateResult.error;
-      }
+      const { error } = await supabase.rpc('approve_user', { target_user_id: userId });
 
       if (error) {
         console.error('Error approving user:', error);
@@ -306,7 +273,7 @@ export const AdminDashboard = () => {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-                        {user.user_status}
+                        pending
                       </Badge>
                     </TableCell>
                     <TableCell>
