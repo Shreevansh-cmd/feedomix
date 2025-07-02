@@ -76,11 +76,25 @@ export const AdminDashboard = () => {
   const fetchPendingUsers = async () => {
     try {
       console.log('Fetching pending users...');
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, email, full_name, created_at, user_status')
-        .eq('user_status', 'pending')
-        .order('created_at', { ascending: false });
+      
+      // Use RPC function if available, otherwise direct query
+      let data, error;
+      
+      try {
+        const rpcResult = await supabase.rpc('get_pending_users');
+        data = rpcResult.data;
+        error = rpcResult.error;
+      } catch (rpcError) {
+        console.log('RPC function not available, using direct query');
+        const directResult = await supabase
+          .from('profiles')
+          .select('id, email, full_name, created_at, user_status')
+          .eq('user_status', 'pending')
+          .order('created_at', { ascending: false });
+        
+        data = directResult.data;
+        error = directResult.error;
+      }
 
       console.log('Pending users query result:', { data, error });
 
@@ -88,7 +102,7 @@ export const AdminDashboard = () => {
         console.error('Error fetching pending users:', error);
         toast({
           title: "Error",
-          description: "Failed to fetch pending users",
+          description: "Failed to fetch pending users: " + error.message,
           variant: "destructive",
         });
         return;
@@ -98,6 +112,11 @@ export const AdminDashboard = () => {
       setPendingUsers(data || []);
     } catch (error) {
       console.error('Error fetching pending users:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch pending users",
+        variant: "destructive",
+      });
     }
   };
 
@@ -129,13 +148,25 @@ export const AdminDashboard = () => {
   const approveUser = async (userId: string) => {
     try {
       console.log('Approving user:', userId);
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          user_status: 'active', 
-          updated_at: new Date().toISOString() 
-        })
-        .eq('id', userId);
+      
+      // Try RPC function first, fallback to direct update
+      let error;
+      
+      try {
+        const rpcResult = await supabase.rpc('approve_user', { target_user_id: userId });
+        error = rpcResult.error;
+      } catch (rpcError) {
+        console.log('RPC function not available, using direct update');
+        const updateResult = await supabase
+          .from('profiles')
+          .update({ 
+            user_status: 'active', 
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', userId);
+        
+        error = updateResult.error;
+      }
 
       if (error) {
         console.error('Error approving user:', error);
@@ -154,7 +185,7 @@ export const AdminDashboard = () => {
       console.error('Error approving user:', error);
       toast({
         title: "Error",
-        description: "Failed to approve user",
+        description: "Failed to approve user: " + (error as any)?.message,
         variant: "destructive",
       });
     }
