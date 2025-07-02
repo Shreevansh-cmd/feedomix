@@ -47,8 +47,8 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-3">
           <img 
-            src="/lovable-uploads/33295f66-b6a1-4b81-a804-9c5bfd049adb.png" 
-            alt="Feedomix Logo" 
+            src="/lovable-uploads/1c1aae96-4be3-4a3d-a676-075fa5697714.png" 
+            alt="FeedoMix Logo" 
             className="h-10 w-auto"
           />
         </Link>

@@ -9,6 +9,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Navbar } from "@/components/Navbar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Ingredients from "./pages/Ingredients";
@@ -37,23 +38,32 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <Navbar />
               <Routes>
+                <Route path="/loading" element={<LoadingScreen />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/" element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  </>
                 } />
                 <Route path="/ingredients" element={
-                  <ProtectedRoute>
-                    <Ingredients />
-                  </ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <ProtectedRoute>
+                      <Ingredients />
+                    </ProtectedRoute>
+                  </>
                 } />
                 <Route path="/admin" element={
-                  <AdminRoute>
-                    <Admin />
-                  </AdminRoute>
+                  <>
+                    <Navbar />
+                    <AdminRoute>
+                      <Admin />
+                    </AdminRoute>
+                  </>
                 } />
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -18,19 +18,21 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     if (user) {
       checkUserStatus();
+    } else {
+      setStatusLoading(false);
     }
   }, [user]);
 
   const checkUserStatus = async () => {
     try {
-      // Check if this is the predefined admin email
+      // Check if this is the predefined admin email - they get auto-approved
       if (user?.email === 'whiteshadow1136@gmail.com') {
-        // Automatically set as active admin - no approval needed
         setUserStatus('active');
         setStatusLoading(false);
         return;
       }
 
+      // For all other users, check their status in the profiles table
       const { data, error } = await supabase
         .from('profiles')
         .select('user_status')
@@ -39,6 +41,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
       if (error) {
         console.error('Error fetching user status:', error);
+        // If profile doesn't exist yet, user is pending
         setUserStatus('pending');
       } else {
         setUserStatus(data?.user_status || 'pending');
