@@ -7,7 +7,7 @@ import { IngredientSelector } from '@/components/IngredientSelector';
 import { FeedPlanResults } from '@/components/FeedPlanResults';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useDefaultIngredients } from '@/hooks/useDefaultIngredients';
+
 
 export interface BirdType {
   id: string;
@@ -37,9 +37,6 @@ export interface SelectedInputs {
 
 const Index = () => {
   console.log('Index page rendering...');
-  
-  // Initialize default ingredients when user accesses the main page
-  useDefaultIngredients();
 
   const [selectedInputs, setSelectedInputs] = useState<SelectedInputs>({
     birdType: '',

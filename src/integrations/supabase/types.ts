@@ -44,7 +44,7 @@ export type Database = {
           phosphorus_percentage: number | null
           protein_percentage: number | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           ash_percentage?: number | null
@@ -62,7 +62,7 @@ export type Database = {
           phosphorus_percentage?: number | null
           protein_percentage?: number | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           ash_percentage?: number | null
@@ -80,7 +80,7 @@ export type Database = {
           phosphorus_percentage?: number | null
           protein_percentage?: number | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
