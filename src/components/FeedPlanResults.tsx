@@ -78,30 +78,87 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
   const dailyFeedPerBird = selectedInputs.birdType === 'broiler' ? 120 : 130; // grams
   const totalDailyFeed = (selectedInputs.birdCount * dailyFeedPerBird) / 1000; // kg
   
-  // Calculate ingredient proportions based on available ingredients
+  // Calculate ingredient proportions based on nutritional requirements
   const getIngredientQuantities = () => {
     if (ingredientsData.length === 0) return [];
     
-    // For simplicity, distribute equally among selected ingredients
-    // In a real application, this would use proper feed formulation algorithms
-    const equalProportion = 1 / ingredientsData.length;
+    // Deduplicate ingredients by name (keep first occurrence)
+    const uniqueIngredients = ingredientsData.filter((ingredient, index, self) => 
+      index === self.findIndex(i => i.name === ingredient.name)
+    );
     
-    return ingredientsData.map((ingredient) => {
-      const dailyQuantity = totalDailyFeed * equalProportion;
+    if (uniqueIngredients.length === 0) return [];
+    
+    // Parse target requirements from phase
+    const targetProteinPercent = parseFloat(selectedPhase?.protein?.replace('%', '') || '0');
+    const targetEnergyKcal = parseFloat(selectedPhase?.energy?.split(' ')[0] || '0');
+    
+    // Calculate optimal ingredient quantities based on nutritional contribution
+    const calculateOptimalQuantities = () => {
+      // Start with basic formulation weights based on ingredient types and nutritional density
+      const ingredientWeights = uniqueIngredients.map(ingredient => {
+        const proteinContent = Number(ingredient.protein_percentage) || 0;
+        const energyContent = Number(ingredient.energy_kcal_per_kg) || 0;
+        
+        // Calculate weight based on how well ingredient contributes to targets
+        let weight = 1; // Base weight
+        
+        // High protein ingredients get higher weight if protein target is high
+        if (targetProteinPercent > 20 && proteinContent > 30) {
+          weight += 2; // Protein sources like soybean meal
+        } else if (targetProteinPercent > 15 && proteinContent > 20) {
+          weight += 1.5;
+        }
+        
+        // High energy ingredients get weight based on energy target
+        if (targetEnergyKcal > 3000 && energyContent > 3000) {
+          weight += 1.5; // Energy sources like oils, grains
+        } else if (energyContent > 2500) {
+          weight += 1;
+        }
+        
+        // Additives and minerals get smaller portions
+        if (ingredient.name.toLowerCase().includes('premix') || 
+            ingredient.name.toLowerCase().includes('salt') ||
+            ingredient.name.toLowerCase().includes('limestone') ||
+            ingredient.name.toLowerCase().includes('dcp')) {
+          weight = 0.1; // Very small amounts for additives
+        }
+        
+        // Oil gets moderate weight
+        if (ingredient.name.toLowerCase().includes('oil')) {
+          weight = 0.8;
+        }
+        
+        return Math.max(weight, 0.1); // Minimum weight to ensure all ingredients are included
+      });
       
-      return {
-        ingredient: ingredient.name,
-        quantity: dailyQuantity,
-        unit: 'kg',
-        percentage: ((equalProportion * 100)).toFixed(1),
-        name: ingredient.name,
-        protein_percentage: Number(ingredient.protein_percentage) || 0,
-        fat_percentage: Number(ingredient.fat_percentage) || 0,
-        fiber_percentage: Number(ingredient.fiber_percentage) || 0,
-        ash_percentage: Number(ingredient.ash_percentage) || 0,
-        moisture_percentage: Number(ingredient.moisture_percentage) || 0
-      };
-    });
+      // Normalize weights to sum to 1
+      const totalWeight = ingredientWeights.reduce((sum, weight) => sum + weight, 0);
+      const normalizedWeights = ingredientWeights.map(weight => weight / totalWeight);
+      
+      // Apply weights to total feed
+      return uniqueIngredients.map((ingredient, index) => {
+        const proportion = normalizedWeights[index];
+        const dailyQuantity = totalDailyFeed * proportion;
+        
+        return {
+          ingredient: ingredient.name,
+          quantity: dailyQuantity,
+          unit: 'kg',
+          percentage: (proportion * 100).toFixed(1),
+          name: ingredient.name,
+          protein_percentage: Number(ingredient.protein_percentage) || 0,
+          fat_percentage: Number(ingredient.fat_percentage) || 0,
+          fiber_percentage: Number(ingredient.fiber_percentage) || 0,
+          ash_percentage: Number(ingredient.ash_percentage) || 0,
+          moisture_percentage: Number(ingredient.moisture_percentage) || 0,
+          energy_kcal_per_kg: Number(ingredient.energy_kcal_per_kg) || 0
+        };
+      });
+    };
+    
+    return calculateOptimalQuantities();
   };
 
   const ingredientQuantities = getIngredientQuantities();
