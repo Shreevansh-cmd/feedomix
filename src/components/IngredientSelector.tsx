@@ -48,7 +48,7 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
       const { data, error } = await supabase
         .from('feed_ingredients')
         .select('*')
-        .eq('user_id', user.id)
+        .or(`user_id.eq.${user.id},is_default.eq.true`)
         .order('category', { ascending: true })
         .order('name', { ascending: true });
 
