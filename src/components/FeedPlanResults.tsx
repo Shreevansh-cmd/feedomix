@@ -49,8 +49,7 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
       const { data, error } = await supabase
         .from('feed_ingredients')
         .select('*')
-        .in('id', selectedInputs.selectedIngredients)
-        .eq('user_id', user?.id);
+        .in('id', selectedInputs.selectedIngredients);
 
       if (error) {
         console.error('Error fetching ingredients:', error);
