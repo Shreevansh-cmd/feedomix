@@ -74,7 +74,7 @@ const Index = () => {
               Advanced Feed Optimization
             </Badge>
             <h1 className="text-display text-primary-foreground mb-6">
-              FeedoMix Pro
+              FeedoMix
             </h1>
             <p className="text-subtitle text-primary-foreground/90 mb-8 max-w-3xl mx-auto">
               Create optimal daily feeding plans for broilers and layers with precision nutrition management. 
@@ -136,7 +136,7 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 gap-12">
           {/* Input Section */}
           <div className="space-y-8 animate-slide-up">
             <Card className="card-elevated border-border-light backdrop-blur-sm">
