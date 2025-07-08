@@ -7,7 +7,9 @@ import { Separator } from '@/components/ui/separator';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { SelectedInputs } from '@/pages/Index';
 import { birdTypes } from '@/data/feedData';
-import { Download, Scale, Target } from 'lucide-react';
+import { Download, Scale, Target, TrendingUp, Clock, Award } from 'lucide-react';
+import broilerImage from '@/assets/broiler-chickens.jpg';
+import layerImage from '@/assets/layer-chickens.jpg';
 import { NutrientAnalysis } from '@/components/NutrientAnalysis';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -226,13 +228,20 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
 
   if (loading) {
     return (
-      <Card className="shadow-lg border-blue-200">
-        <CardHeader className="bg-blue-100">
-          <CardTitle className="text-blue-800">Feed Plan Results</CardTitle>
+      <Card className="card-elevated border-primary/20">
+        <CardHeader className="bg-gradient-primary text-primary-foreground rounded-t-lg">
+          <CardTitle className="text-xl flex items-center gap-3">
+            <TrendingUp className="h-6 w-6" />
+            Feed Plan Results
+          </CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="text-center py-8">
-            <div className="text-lg">Loading feed plan...</div>
+        <CardContent className="pt-8">
+          <div className="text-center py-12">
+            <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+              <Clock className="h-8 w-8 text-primary animate-spin" />
+            </div>
+            <div className="text-lg font-medium">Calculating optimal feed plan...</div>
+            <div className="text-sm text-muted-foreground mt-2">This may take a moment</div>
           </div>
         </CardContent>
       </Card>
@@ -241,96 +250,158 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
 
   if (!selectedBird || !selectedPhase) {
     return (
-      <Card className="shadow-lg border-blue-200">
-        <CardHeader className="bg-blue-100">
-          <CardTitle className="text-blue-800">Feed Plan Results</CardTitle>
+      <Card className="card-elevated border-warning/20">
+        <CardHeader className="bg-gradient-accent text-accent-foreground rounded-t-lg">
+          <CardTitle className="text-xl flex items-center gap-3">
+            <Target className="h-6 w-6" />
+            Feed Plan Results
+          </CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-6xl mb-4">🐔</div>
-            <p className="text-lg">Please select bird type and phase to continue</p>
+        <CardContent className="pt-8">
+          <div className="text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-warning/10 to-warning/20 rounded-full flex items-center justify-center">
+              <div className="text-4xl">🐔</div>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Configuration Required</h3>
+            <p className="text-muted-foreground">Please select bird type and phase to continue with your feed plan</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
+  const birdImage = selectedInputs.birdType === 'broiler' ? broilerImage : layerImage;
+
   return (
-    <div className="space-y-6">
-      {/* Summary Card */}
-      <Card className="shadow-lg border-green-200">
-        <CardHeader className="bg-green-100">
-          <CardTitle className="text-green-800 flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            Feed Plan Summary
-          </CardTitle>
+    <div className="space-y-8 animate-fade-in">
+      {/* Enhanced Summary Card */}
+      <Card className="card-elevated border-success/20 overflow-hidden">
+        <CardHeader className="bg-gradient-primary text-primary-foreground rounded-t-lg relative">
+          <div className="absolute inset-0 opacity-20">
+            <img src={birdImage} alt={selectedBird?.name} className="w-full h-full object-cover" />
+          </div>
+          <div className="relative">
+            <CardTitle className="text-2xl flex items-center gap-3">
+              <Award className="h-6 w-6" />
+              Feed Plan Summary
+            </CardTitle>
+            <Badge className="mt-2 bg-accent text-accent-foreground">
+              Optimized for {selectedBird?.name}
+            </Badge>
+          </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <p className="text-sm text-gray-600">Bird Type</p>
-              <p className="font-semibold">{selectedBird?.name}</p>
+        <CardContent className="pt-8">
+          {/* Key Metrics Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl">
+              <div className="text-2xl font-bold text-primary mb-1">{selectedBird?.name}</div>
+              <div className="text-sm text-muted-foreground">Bird Type</div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Phase</p>
-              <p className="font-semibold">{selectedPhase?.name}</p>
+            <div className="text-center p-4 bg-gradient-to-br from-accent/10 to-accent/20 rounded-xl">
+              <div className="text-2xl font-bold text-accent-foreground mb-1">{selectedPhase?.name}</div>
+              <div className="text-sm text-muted-foreground">Growth Phase</div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Number of Birds</p>
-              <p className="font-semibold">{selectedInputs.birdCount.toLocaleString()}</p>
+            <div className="text-center p-4 bg-gradient-to-br from-secondary/20 to-secondary/30 rounded-xl">
+              <div className="text-2xl font-bold text-secondary-foreground mb-1">{selectedInputs.birdCount.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Total Birds</div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Daily Feed Requirement</p>
-              <p className="font-semibold">{totalDailyFeed.toFixed(1)} kg</p>
+            <div className="text-center p-4 bg-gradient-to-br from-success/10 to-success/20 rounded-xl">
+              <div className="text-2xl font-bold text-success mb-1">{totalDailyFeed.toFixed(1)} kg</div>
+              <div className="text-sm text-muted-foreground">Daily Feed</div>
             </div>
           </div>
           
-          <Separator className="my-4" />
+          <Separator className="my-6" />
           
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">Nutritional Requirements</h4>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <span className="text-blue-600">Protein:</span> {selectedPhase?.protein}
+          {/* Nutritional Requirements */}
+          <div className="bg-gradient-to-br from-muted/30 to-muted/10 p-6 rounded-xl">
+            <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              Nutritional Requirements
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center gap-3 p-3 bg-background rounded-lg shadow-sm">
+                <div className="w-3 h-3 bg-primary rounded-full"></div>
+                <div>
+                  <div className="font-medium">Protein</div>
+                  <div className="text-sm text-muted-foreground">{selectedPhase?.protein}</div>
+                </div>
               </div>
-              <div>
-                <span className="text-blue-600">Energy:</span> {selectedPhase?.energy}
+              <div className="flex items-center gap-3 p-3 bg-background rounded-lg shadow-sm">
+                <div className="w-3 h-3 bg-accent rounded-full"></div>
+                <div>
+                  <div className="font-medium">Energy</div>
+                  <div className="text-sm text-muted-foreground">{selectedPhase?.energy}</div>
+                </div>
               </div>
-              <div>
-                <span className="text-blue-600">Age Range:</span> {selectedPhase?.ageRange}
+              <div className="flex items-center gap-3 p-3 bg-background rounded-lg shadow-sm">
+                <div className="w-3 h-3 bg-secondary-foreground rounded-full"></div>
+                <div>
+                  <div className="font-medium">Age Range</div>
+                  <div className="text-sm text-muted-foreground">{selectedPhase?.ageRange}</div>
+                </div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Ingredient Breakdown */}
-      <Card className="shadow-lg border-orange-200">
-        <CardHeader className="bg-orange-100">
-          <CardTitle className="text-orange-800 flex items-center gap-2">
-            <Scale className="h-5 w-5" />
+      {/* Enhanced Ingredient Breakdown */}
+      <Card className="card-elevated border-accent/20">
+        <CardHeader className="bg-gradient-accent text-accent-foreground rounded-t-lg">
+          <CardTitle className="text-xl flex items-center gap-3">
+            <Scale className="h-6 w-6" />
             Daily Ingredient Requirements
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-3 mb-6">
+        <CardContent className="pt-8">
+          <div className="space-y-4 mb-8">
             {ingredientQuantities.map((item, index) => (
-              <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium">{item.ingredient}</p>
-                  <p className="text-sm text-gray-600">{item.percentage}% of total feed</p>
+              <div key={index} className="ingredient-item group">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center">
+                      <Scale className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-lg">{item.ingredient}</h4>
+                      <p className="text-sm text-muted-foreground">{item.percentage}% of total feed</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <Badge className="bg-primary text-primary-foreground text-base px-4 py-2">
+                      {item.quantity.toFixed(2)} {item.unit}
+                    </Badge>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Per day
+                    </div>
+                  </div>
                 </div>
-                <Badge variant="secondary" className="text-sm">
-                  {item.quantity.toFixed(2)} {item.unit}
-                </Badge>
+                
+                {/* Progress bar showing proportion */}
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                    <span>Proportion</span>
+                    <span>{item.percentage}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-primary to-primary-light h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${item.percentage}%` }}
+                    ></div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
 
           {ingredientQuantities.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No ingredients selected.</p>
-              <p className="text-sm mt-1">Please select ingredients to see the feed plan.</p>
+            <div className="text-center py-16">
+              <div className="w-20 h-20 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                <Scale className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No ingredients selected</h3>
+              <p className="text-muted-foreground">Please select ingredients to see your optimized feed plan</p>
             </div>
           )}
         </CardContent>
@@ -344,52 +415,105 @@ export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
         />
       )}
 
-      {/* Chart */}
+      {/* Enhanced Chart */}
       {chartData.length > 0 && (
-        <Card className="shadow-lg border-purple-200">
-          <CardHeader className="bg-purple-100">
-            <CardTitle className="text-purple-800">Ingredient Distribution</CardTitle>
+        <Card className="card-elevated border-secondary/20">
+          <CardHeader className="bg-gradient-secondary text-secondary-foreground rounded-t-lg">
+            <CardTitle className="text-xl flex items-center gap-3">
+              <TrendingUp className="h-6 w-6" />
+              Ingredient Distribution Analysis
+            </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div className="h-64">
+          <CardContent className="pt-8">
+            <div className="h-80 mb-6">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.6} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis 
                     dataKey="name" 
                     angle={-45}
                     textAnchor="end"
                     height={80}
-                    fontSize={12}
+                    fontSize={11}
+                    tick={{ fill: 'hsl(var(--foreground))' }}
                   />
                   <YAxis 
-                    label={{ value: 'Quantity (kg)', angle: -90, position: 'insideLeft' }}
-                    fontSize={12}
+                    label={{ value: 'Daily Quantity (kg)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+                    fontSize={11}
+                    tick={{ fill: 'hsl(var(--foreground))' }}
                   />
                   <Tooltip 
                     formatter={(value, name) => [`${value} kg`, 'Daily Quantity']}
                     labelFormatter={(label) => `Ingredient: ${label}`}
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
                   />
-                  <Bar dataKey="quantity" fill="#8b5cf6" />
+                  <Bar 
+                    dataKey="quantity" 
+                    fill="url(#barGradient)"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+            
+            {/* Chart Summary */}
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Total Ingredients</div>
+                <div className="text-lg font-semibold">{chartData.length}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Largest Component</div>
+                <div className="text-lg font-semibold">
+                  {Math.max(...chartData.map(item => item.percentage)).toFixed(1)}%
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Total Weight</div>
+                <div className="text-lg font-semibold">{totalDailyFeed.toFixed(1)} kg</div>
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Download Button */}
+      {/* Enhanced Download Section */}
       {ingredientQuantities.length > 0 && (
-        <div className="text-center">
-          <Button 
-            onClick={handleDownloadPDF}
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
-            size="lg"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Download Feed Plan Report
-          </Button>
-        </div>
+        <Card className="card-interactive border-primary/20">
+          <CardContent className="pt-8">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-primary rounded-full flex items-center justify-center shadow-colored">
+                <Download className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Download Your Feed Plan</h3>
+              <p className="text-muted-foreground mb-6">
+                Get a comprehensive report with all ingredients, nutritional analysis, and feeding guidelines
+              </p>
+              <Button 
+                onClick={handleDownloadPDF}
+                className="btn-gradient px-8 py-4 text-lg"
+                size="lg"
+              >
+                <Download className="h-5 w-5 mr-3" />
+                Download Complete Report
+              </Button>
+              <div className="mt-4 text-xs text-muted-foreground">
+                Includes: Ingredient breakdown • Nutritional analysis • Feeding schedule
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
