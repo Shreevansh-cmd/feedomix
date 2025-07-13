@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, Plus, Edit } from 'lucide-react';
+import { PriceManager } from '@/components/PriceManager';
 import { Database } from '@/integrations/supabase/types';
 
 type IngredientCategory = Database['public']['Enums']['ingredient_category'];
@@ -400,10 +401,11 @@ const Ingredients = () => {
             </CardHeader>
             <CardContent className="pt-6">
               <Tabs defaultValue="custom" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="custom">Custom ({userIngredients.length})</TabsTrigger>
                   <TabsTrigger value="default">Default ({defaultIngredients.length})</TabsTrigger>
                   <TabsTrigger value="categorized">By Category</TabsTrigger>
+                  <TabsTrigger value="prices">Prices</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="custom" className="space-y-4">
@@ -524,6 +526,10 @@ const Ingredients = () => {
                       </div>
                     ))}
                   </div>
+                </TabsContent>
+
+                <TabsContent value="prices" className="space-y-4">
+                  <PriceManager />
                 </TabsContent>
               </Tabs>
             </CardContent>

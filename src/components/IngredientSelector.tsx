@@ -22,16 +22,19 @@ interface Ingredient {
   ash_percentage: number;
   calcium_percentage: number;
   phosphorus_percentage: number;
+  cost_per_kg: number;
 }
 
 interface IngredientSelectorProps {
   selectedIngredients: string[];
   onIngredientsChange: (ingredients: string[]) => void;
+  onIngredientsDataChange?: (ingredientsData: Ingredient[]) => void;
 }
 
 export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
   selectedIngredients,
   onIngredientsChange,
+  onIngredientsDataChange,
 }) => {
   const { user } = useAuth();
 
@@ -58,7 +61,14 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
       }
       
       console.log('Fetched ingredients:', data);
-      return data as Ingredient[];
+      const ingredientsData = data as Ingredient[];
+      
+      // Pass ingredients data to parent component
+      if (onIngredientsDataChange) {
+        onIngredientsDataChange(ingredientsData);
+      }
+      
+      return ingredientsData;
     },
     enabled: !!user,
   });
@@ -207,6 +217,11 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
                           <span>Energy: {ingredient.energy_kcal_per_kg} kcal/kg</span>
                           <span>Fat: {ingredient.fat_percentage}%</span>
                           <span>Fiber: {ingredient.fiber_percentage}%</span>
+                          {ingredient.cost_per_kg > 0 && (
+                            <span className="text-green-600 font-medium col-span-2">
+                              Cost: ${ingredient.cost_per_kg}/kg
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

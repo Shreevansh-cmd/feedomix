@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Target, Calculator, TrendingUp } from 'lucide-react';
+import { CostOptimizer } from '@/components/CostOptimizer';
 import heroImage from '@/assets/broiler-chickens.jpg';
 import feedIngredientsImage from '@/assets/feed-ingredients.jpg';
 
@@ -39,6 +40,13 @@ export interface SelectedInputs {
   selectedIngredients: string[];
 }
 
+interface OptimizedResult {
+  ingredientId: string;
+  name: string;
+  quantity: number;
+  cost: number;
+}
+
 const Index = () => {
   console.log('Index page rendering...');
 
@@ -49,8 +57,43 @@ const Index = () => {
     selectedIngredients: []
   });
 
+  const [optimizationEnabled, setOptimizationEnabled] = useState(false);
+  const [optimizedResults, setOptimizedResults] = useState<OptimizedResult[]>([]);
+  const [ingredientsData, setIngredientsData] = useState<any[]>([]);
+
   const updateInputs = (updates: Partial<SelectedInputs>) => {
     setSelectedInputs(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleOptimizationChange = (isEnabled: boolean, results?: OptimizedResult[]) => {
+    setOptimizationEnabled(isEnabled);
+    setOptimizedResults(results || []);
+  };
+
+  // Get target nutrition values based on selected phase
+  const getTargetNutrition = () => {
+    const selectedBird = [
+      { id: 'broiler', name: 'Broiler', phases: [] },
+      { id: 'layer', name: 'Layer', phases: [] }
+    ].find(bird => bird.id === selectedInputs.birdType);
+    
+    // Default values if no phase is selected
+    let targetProtein = 20;
+    let targetEnergy = 3000;
+    
+    // You can extend this with actual phase data
+    if (selectedInputs.phase === 'broiler-pre-starter') {
+      targetProtein = 23;
+      targetEnergy = 3000;
+    } else if (selectedInputs.phase === 'broiler-starter') {
+      targetProtein = 22;
+      targetEnergy = 3100;
+    } else if (selectedInputs.phase === 'broiler-finisher') {
+      targetProtein = 20;
+      targetEnergy = 3200;
+    }
+    
+    return { targetProtein, targetEnergy };
   };
 
   const isReadyToCalculate = selectedInputs.birdType && 
@@ -175,9 +218,21 @@ const Index = () => {
                 <IngredientSelector 
                   selectedIngredients={selectedInputs.selectedIngredients}
                   onIngredientsChange={(selectedIngredients) => updateInputs({ selectedIngredients })}
+                  onIngredientsDataChange={setIngredientsData}
                 />
               </CardContent>
             </Card>
+
+            {/* Cost Optimization Section */}
+            {selectedInputs.selectedIngredients.length > 0 && (
+              <CostOptimizer
+                selectedIngredients={ingredientsData}
+                selectedIngredientIds={selectedInputs.selectedIngredients}
+                targetProtein={getTargetNutrition().targetProtein}
+                targetEnergy={getTargetNutrition().targetEnergy}
+                onOptimizationChange={handleOptimizationChange}
+              />
+            )}
 
             {/* Ingredients Preview */}
             <Card className="card-interactive border-accent/20">
@@ -216,7 +271,11 @@ const Index = () => {
           {/* Results Section */}
           <div className="animate-slide-up delay-200">
             {isReadyToCalculate ? (
-              <FeedPlanResults selectedInputs={selectedInputs} />
+              <FeedPlanResults 
+                selectedInputs={selectedInputs} 
+                optimizationEnabled={optimizationEnabled}
+                optimizedResults={optimizedResults}
+              />
             ) : (
               <Card className="card-elevated border-muted">
                 <CardHeader className="bg-gradient-secondary text-secondary-foreground rounded-t-lg">

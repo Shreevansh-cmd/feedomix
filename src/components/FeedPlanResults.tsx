@@ -6,6 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { SelectedInputs } from '@/pages/Index';
+
+interface OptimizedResult {
+  ingredientId: string;
+  name: string;
+  quantity: number;
+  cost: number;
+}
 import { birdTypes } from '@/data/feedData';
 import { Download, Scale, Target, TrendingUp, Clock, Award } from 'lucide-react';
 import broilerImage from '@/assets/broiler-chickens.jpg';
@@ -17,6 +24,8 @@ import { useAuth } from '@/hooks/useAuth';
 
 interface FeedPlanResultsProps {
   selectedInputs: SelectedInputs;
+  optimizationEnabled?: boolean;
+  optimizedResults?: OptimizedResult[];
 }
 
 interface IngredientData {
@@ -30,7 +39,7 @@ interface IngredientData {
   energy_kcal_per_kg: number;
 }
 
-export const FeedPlanResults = ({ selectedInputs }: FeedPlanResultsProps) => {
+export const FeedPlanResults = ({ selectedInputs, optimizationEnabled, optimizedResults }: FeedPlanResultsProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [ingredientsData, setIngredientsData] = useState<IngredientData[]>([]);
