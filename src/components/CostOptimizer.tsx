@@ -167,7 +167,7 @@ export const CostOptimizer: React.FC<CostOptimizerProps> = ({
                       <span className="text-sm font-medium">Total Cost</span>
                     </div>
                     <p className="text-lg font-bold text-green-600">
-                      ${totalCost.toFixed(2)}
+                      ₹{totalCost.toFixed(2)}
                     </p>
                   </div>
                   
@@ -178,7 +178,7 @@ export const CostOptimizer: React.FC<CostOptimizerProps> = ({
                         <span className="text-sm font-medium">Cost Saved</span>
                       </div>
                       <p className="text-lg font-bold text-blue-600">
-                        ${costSaved.toFixed(2)}
+                        ₹{costSaved.toFixed(2)}
                       </p>
                     </div>
                   )}
@@ -186,7 +186,7 @@ export const CostOptimizer: React.FC<CostOptimizerProps> = ({
                   <div className="bg-white/50 rounded-lg p-3">
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">
-                        Per kg cost: ${(totalCost).toFixed(2)}
+                        Per kg: ₹{(totalCost).toFixed(2)}
                       </Badge>
                     </div>
                   </div>
@@ -205,7 +205,7 @@ export const CostOptimizer: React.FC<CostOptimizerProps> = ({
                         </div>
                         <div className="text-right">
                           <span className="text-sm font-medium text-green-600">
-                            ${result.cost.toFixed(2)}
+                            ₹{result.cost.toFixed(2)}
                           </span>
                         </div>
                       </div>

@@ -203,7 +203,7 @@ export const PriceManager = () => {
                     ) : (
                       <div className="flex items-center gap-2">
                         <span className="font-medium">
-                          ${ingredient.cost_per_kg.toFixed(2)}
+                          ₹{ingredient.cost_per_kg.toFixed(2)}/kg
                         </span>
                       </div>
                     )}

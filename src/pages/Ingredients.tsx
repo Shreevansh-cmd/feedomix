@@ -453,7 +453,7 @@ const Ingredients = () => {
                           </div>
                           {ingredient.cost_per_kg > 0 && (
                             <div className="text-sm font-medium text-green-600">
-                              Cost: ${ingredient.cost_per_kg}/kg
+                              ₹{ingredient.cost_per_kg.toFixed(2)}/kg
                             </div>
                           )}
                         </div>

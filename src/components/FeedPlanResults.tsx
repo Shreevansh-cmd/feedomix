@@ -497,6 +497,44 @@ export const FeedPlanResults = ({ selectedInputs, optimizationEnabled, optimized
         </Card>
       )}
 
+      {/* Cost Summary Section */}
+      {optimizationEnabled && optimizedResults && optimizedResults.length > 0 && (
+        <Card className="border-green-200 bg-green-50">
+          <CardHeader>
+            <CardTitle className="text-green-800 flex items-center gap-2">
+              <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                ₹
+              </div>
+              Daily Feed Cost Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {optimizedResults.map((result) => (
+                <div key={result.ingredientId} className="flex justify-between items-center bg-white rounded-lg p-3">
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium">{result.name}</span>
+                    <Badge variant="outline" className="text-xs">
+                      {result.quantity}g
+                    </Badge>
+                  </div>
+                  <span className="font-semibold text-green-600">
+                    ₹{result.cost.toFixed(2)}
+                  </span>
+                </div>
+              ))}
+              <Separator />
+              <div className="flex justify-between items-center bg-green-100 rounded-lg p-3">
+                <span className="font-bold text-green-800">Total per bird/day:</span>
+                <span className="font-bold text-green-600 text-lg">
+                  ₹{optimizedResults.reduce((sum, result) => sum + result.cost, 0).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Enhanced Download Section */}
       {ingredientQuantities.length > 0 && (
         <Card className="card-interactive border-primary/20">
