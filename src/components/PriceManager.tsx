@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Edit2, Save, X, Clock } from 'lucide-react';
+import { Edit2, Save, X, Clock, RefreshCw, AlertTriangle } from 'lucide-react';
 
 interface Ingredient {
   id: string;
@@ -16,6 +16,9 @@ interface Ingredient {
   cost_per_kg: number;
   updated_at: string;
   is_default: boolean;
+  price_source: string;
+  price_updated_at: string;
+  is_price_custom: boolean;
 }
 
 export const PriceManager = () => {
@@ -25,6 +28,7 @@ export const PriceManager = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState('');
   const [loading, setLoading] = useState(true);
+  const [fetchingLivePrices, setFetchingLivePrices] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -36,7 +40,7 @@ export const PriceManager = () => {
     try {
       const { data, error } = await supabase
         .from('feed_ingredients')
-        .select('id, name, category, cost_per_kg, updated_at, is_default')
+        .select('id, name, category, cost_per_kg, updated_at, is_default, price_source, price_updated_at, is_price_custom')
         .or(`user_id.eq.${user?.id},is_default.eq.true`)
         .order('category', { ascending: true })
         .order('name', { ascending: true });
@@ -75,7 +79,10 @@ export const PriceManager = () => {
         .from('feed_ingredients')
         .update({ 
           cost_per_kg: newPrice,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          price_source: 'manual',
+          price_updated_at: new Date().toISOString(),
+          is_price_custom: true
         })
         .eq('id', ingredientId);
 
@@ -96,6 +103,31 @@ export const PriceManager = () => {
         description: "Failed to update price",
         variant: "destructive",
       });
+    }
+  };
+
+  const fetchLivePrices = async () => {
+    setFetchingLivePrices(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-ingredient-prices');
+      
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: data.message,
+      });
+
+      fetchIngredients();
+    } catch (error) {
+      console.error('Error fetching live prices:', error);
+      toast({
+        title: "Warning",
+        description: "Live price unavailable. Using last known values.",
+        variant: "destructive",
+      });
+    } finally {
+      setFetchingLivePrices(false);
     }
   };
 
@@ -144,6 +176,16 @@ export const PriceManager = () => {
         <p className="text-sm text-muted-foreground">
           Manage pricing for your feed ingredients. Prices are used for cost optimization calculations.
         </p>
+        <div className="flex gap-2 mt-4">
+          <Button 
+            onClick={fetchLivePrices}
+            disabled={fetchingLivePrices}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${fetchingLivePrices ? 'animate-spin' : ''}`} />
+            {fetchingLivePrices ? 'Fetching...' : 'Fetch Live Prices'}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
@@ -200,11 +242,21 @@ export const PriceManager = () => {
                           <X className="h-3 w-3" />
                         </Button>
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          ₹{ingredient.cost_per_kg.toFixed(2)}/kg
-                        </span>
+                     ) : (
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">
+                            ₹{ingredient.cost_per_kg.toFixed(2)}/kg
+                          </span>
+                          {ingredient.is_price_custom && (
+                            <Badge variant="outline" className="text-xs">
+                              Custom
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Source: {ingredient.price_source}
+                        </div>
                       </div>
                     )}
                   </TableCell>

@@ -44,9 +44,12 @@ export type Database = {
           fiber_percentage: number | null
           id: string
           is_default: boolean | null
+          is_price_custom: boolean | null
           moisture_percentage: number | null
           name: string
           phosphorus_percentage: number | null
+          price_source: string | null
+          price_updated_at: string | null
           protein_percentage: number | null
           updated_at: string
           user_id: string | null
@@ -62,9 +65,12 @@ export type Database = {
           fiber_percentage?: number | null
           id?: string
           is_default?: boolean | null
+          is_price_custom?: boolean | null
           moisture_percentage?: number | null
           name: string
           phosphorus_percentage?: number | null
+          price_source?: string | null
+          price_updated_at?: string | null
           protein_percentage?: number | null
           updated_at?: string
           user_id?: string | null
@@ -80,9 +86,12 @@ export type Database = {
           fiber_percentage?: number | null
           id?: string
           is_default?: boolean | null
+          is_price_custom?: boolean | null
           moisture_percentage?: number | null
           name?: string
           phosphorus_percentage?: number | null
+          price_source?: string | null
+          price_updated_at?: string | null
           protein_percentage?: number | null
           updated_at?: string
           user_id?: string | null
