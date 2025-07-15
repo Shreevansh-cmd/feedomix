@@ -217,11 +217,9 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
                           <span>Energy: {ingredient.energy_kcal_per_kg} kcal/kg</span>
                           <span>Fat: {ingredient.fat_percentage}%</span>
                           <span>Fiber: {ingredient.fiber_percentage}%</span>
-                          {ingredient.cost_per_kg > 0 && (
-                            <span className="text-green-600 font-medium col-span-2">
-                              ₹{ingredient.cost_per_kg.toFixed(2)}/kg
-                            </span>
-                          )}
+                          <span className={`font-medium col-span-2 ${ingredient.cost_per_kg > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                            {ingredient.cost_per_kg > 0 ? `₹${ingredient.cost_per_kg.toFixed(2)}/kg` : 'No price set'}
+                          </span>
                         </div>
                       </div>
                     </div>
