@@ -23,6 +23,9 @@ interface Ingredient {
   calcium_percentage: number;
   phosphorus_percentage: number;
   cost_per_kg: number;
+  price_source?: string;
+  is_price_custom?: boolean;
+  price_updated_at?: string;
 }
 
 interface IngredientSelectorProps {
@@ -217,9 +220,14 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
                           <span>Energy: {ingredient.energy_kcal_per_kg} kcal/kg</span>
                           <span>Fat: {ingredient.fat_percentage}%</span>
                           <span>Fiber: {ingredient.fiber_percentage}%</span>
-                          <span className={`font-medium col-span-2 ${ingredient.cost_per_kg > 0 ? 'text-green-600' : 'text-gray-400'}`}>
-                            {ingredient.cost_per_kg > 0 ? `₹${ingredient.cost_per_kg.toFixed(2)}/kg` : 'No price set'}
-                          </span>
+                          <div className="col-span-2">
+                            <span className={`font-medium ${ingredient.cost_per_kg > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                              {ingredient.cost_per_kg > 0 ? `₹${ingredient.cost_per_kg.toFixed(2)} / kg` : 'No price set'}
+                            </span>
+                            {ingredient.cost_per_kg > 0 && ingredient.price_source === 'auto-filled' && (
+                              <div className="text-xs text-blue-500">Auto-filled — editable</div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

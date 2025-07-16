@@ -29,6 +29,9 @@ interface FeedIngredient {
   phosphorus_percentage: number;
   cost_per_kg: number;
   is_default: boolean;
+  price_source?: string;
+  is_price_custom?: boolean;
+  price_updated_at?: string;
 }
 
 const categories: IngredientCategory[] = [
@@ -38,6 +41,22 @@ const categories: IngredientCategory[] = [
   'Additives',
   'Other'
 ];
+
+// Default prices for common ingredients
+const defaultPrices: { [key: string]: number } = {
+  'Maize': 26,
+  'Soybean Meal': 50,
+  'Soya DOC': 50, // Alternative name for Soybean Meal
+  'Rice Bran': 18,
+  'Vegetable Oil': 110,
+  'Limestone Powder': 6,
+  'DCP': 45,
+  'Salt': 5,
+  'Toxin Binder': 130,
+  'Coccidiostat': 160,
+  'Broiler Premix': 180,
+  'Layer Premix': 160,
+};
 
 const Ingredients = () => {
   const { user } = useAuth();
@@ -74,7 +93,10 @@ const Ingredients = () => {
         .order('name', { ascending: true });
 
       if (error) throw error;
-      setIngredients(data || []);
+      
+      // Auto-fill prices for ingredients with missing or zero prices
+      const ingredientsWithPrices = await autoFillMissingPrices(data || []);
+      setIngredients(ingredientsWithPrices);
     } catch (error) {
       console.error('Error fetching ingredients:', error);
       toast({
@@ -85,6 +107,58 @@ const Ingredients = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const autoFillMissingPrices = async (ingredientsList: FeedIngredient[]) => {
+    const updatedIngredients = [...ingredientsList];
+    const ingredientsToUpdate = [];
+
+    for (const ingredient of ingredientsList) {
+      if ((!ingredient.cost_per_kg || ingredient.cost_per_kg === 0) && defaultPrices[ingredient.name]) {
+        const updatedIngredient = {
+          ...ingredient,
+          cost_per_kg: defaultPrices[ingredient.name],
+          price_source: 'auto-filled',
+          is_price_custom: false,
+        };
+        
+        ingredientsToUpdate.push({
+          id: ingredient.id,
+          cost_per_kg: defaultPrices[ingredient.name],
+          price_source: 'auto-filled',
+          is_price_custom: false,
+        });
+
+        // Update in local array
+        const index = updatedIngredients.findIndex(ing => ing.id === ingredient.id);
+        if (index !== -1) {
+          updatedIngredients[index] = updatedIngredient;
+        }
+      }
+    }
+
+    // Batch update prices in database
+    if (ingredientsToUpdate.length > 0) {
+      try {
+        for (const update of ingredientsToUpdate) {
+          await supabase
+            .from('feed_ingredients')
+            .update({
+              cost_per_kg: update.cost_per_kg,
+              price_source: update.price_source,
+              is_price_custom: update.is_price_custom,
+              price_updated_at: new Date().toISOString(),
+            })
+            .eq('id', update.id);
+        }
+        
+        console.log(`Auto-filled prices for ${ingredientsToUpdate.length} ingredients`);
+      } catch (error) {
+        console.error('Error auto-filling prices:', error);
+      }
+    }
+
+    return updatedIngredients;
   };
 
   const resetForm = () => {
@@ -126,6 +200,29 @@ const Ingredients = () => {
     if (!user) return;
 
     try {
+      const costPerKg = parseFloat(formData.cost_per_kg) || 0;
+      
+      // Validate cost per kg
+      if (costPerKg < 0) {
+        toast({
+          title: "Validation Error",
+          description: "Cost per kg cannot be negative",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Auto-fill price if not provided and ingredient has default price
+      let finalCostPerKg = costPerKg;
+      let priceSource = 'manual';
+      let isPriceCustom = true;
+
+      if (costPerKg === 0 && defaultPrices[formData.name]) {
+        finalCostPerKg = defaultPrices[formData.name];
+        priceSource = 'auto-filled';
+        isPriceCustom = false;
+      }
+
       const ingredientData = {
         name: formData.name,
         category: formData.category as IngredientCategory,
@@ -137,7 +234,10 @@ const Ingredients = () => {
         ash_percentage: parseFloat(formData.ash_percentage) || 0,
         calcium_percentage: parseFloat(formData.calcium_percentage) || 0,
         phosphorus_percentage: parseFloat(formData.phosphorus_percentage) || 0,
-        cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
+        cost_per_kg: finalCostPerKg,
+        price_source: priceSource,
+        is_price_custom: isPriceCustom,
+        price_updated_at: new Date().toISOString(),
       };
 
       if (editingId) {
@@ -366,14 +466,21 @@ const Ingredients = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="cost">Cost per kg</Label>
+                    <Label htmlFor="cost">Cost per kg (₹)</Label>
                     <Input
                       id="cost"
                       type="number"
                       step="0.01"
+                      min="0"
+                      placeholder={defaultPrices[formData.name] ? `Auto-fill: ₹${defaultPrices[formData.name]}` : "Enter cost per kg"}
                       value={formData.cost_per_kg}
                       onChange={(e) => setFormData({ ...formData, cost_per_kg: e.target.value })}
                     />
+                    {defaultPrices[formData.name] && !formData.cost_per_kg && (
+                      <p className="text-sm text-blue-600 mt-1">
+                        Will auto-fill with ₹{defaultPrices[formData.name].toFixed(2)} if left empty
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -451,11 +558,14 @@ const Ingredients = () => {
                             <div>Calcium: {ingredient.calcium_percentage}%</div>
                             <div>Phosphorus: {ingredient.phosphorus_percentage}%</div>
                           </div>
-                          {ingredient.cost_per_kg > 0 && (
-                            <div className="text-sm font-medium text-green-600">
-                              ₹{ingredient.cost_per_kg.toFixed(2)}/kg
-                            </div>
-                          )}
+                          <div className="text-sm font-medium">
+                            <span className={ingredient.cost_per_kg > 0 ? 'text-green-600' : 'text-gray-400'}>
+                              {ingredient.cost_per_kg > 0 ? `₹${ingredient.cost_per_kg.toFixed(2)} / kg` : 'No price set'}
+                            </span>
+                            {ingredient.cost_per_kg > 0 && ingredient.price_source === 'auto-filled' && (
+                              <span className="text-xs text-blue-500 ml-2">Auto-filled — editable</span>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -479,6 +589,14 @@ const Ingredients = () => {
                           <div>Fiber: {ingredient.fiber_percentage}%</div>
                           <div>Calcium: {ingredient.calcium_percentage}%</div>
                           <div>Phosphorus: {ingredient.phosphorus_percentage}%</div>
+                        </div>
+                        <div className="text-sm font-medium">
+                          <span className={ingredient.cost_per_kg > 0 ? 'text-green-600' : 'text-gray-400'}>
+                            {ingredient.cost_per_kg > 0 ? `₹${ingredient.cost_per_kg.toFixed(2)} / kg` : 'No price set'}
+                          </span>
+                          {ingredient.cost_per_kg > 0 && ingredient.price_source === 'auto-filled' && (
+                            <span className="text-xs text-blue-500 ml-2">Auto-filled — editable</span>
+                          )}
                         </div>
                       </div>
                     ))}
