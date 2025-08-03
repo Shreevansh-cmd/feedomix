@@ -41,12 +41,18 @@ export const CostOptimizer: React.FC<CostOptimizerProps> = ({
   const [costSaved, setCostSaved] = useState(0);
 
   const optimizeFeed = () => {
-    // Filter to only selected ingredients
+    // Filter to only selected ingredients with valid costs
     const availableIngredients = selectedIngredients.filter(ing => 
-      selectedIngredientIds.includes(ing.id)
+      selectedIngredientIds.includes(ing.id) && 
+      ing.cost_per_kg > 0
     );
     
-    if (availableIngredients.length === 0) return;
+    console.log('Available ingredients for optimization:', availableIngredients);
+    
+    if (availableIngredients.length === 0) {
+      console.log('No ingredients with valid costs found');
+      return;
+    }
 
     // Simple optimization algorithm using greedy approach
     // This is a simplified version - in practice, you'd use linear programming
@@ -158,7 +164,19 @@ export const CostOptimizer: React.FC<CostOptimizerProps> = ({
       {isOptimizationEnabled && (
         <CardContent>
           <div className="space-y-4">
-            {optimizedResults.length > 0 && (
+            {selectedIngredients.filter(ing => 
+              selectedIngredientIds.includes(ing.id) && 
+              ing.cost_per_kg > 0
+            ).length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">
+                  No ingredients with valid prices found. Please ensure all selected ingredients have cost information.
+                </p>
+                <p className="text-sm text-yellow-600">
+                  Go to "Manage Ingredients" to update prices or select ingredients with existing prices.
+                </p>
+              </div>
+            ) : optimizedResults.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white/50 rounded-lg p-3">
@@ -212,7 +230,22 @@ export const CostOptimizer: React.FC<CostOptimizerProps> = ({
                     ))}
                   </div>
                 </div>
+                
+                <div className="pt-4">
+                  <button
+                    onClick={optimizeFeed}
+                    className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    Recalculate with Updated Prices
+                  </button>
+                </div>
               </>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  Calculating optimized feed plan...
+                </p>
+              </div>
             )}
           </div>
         </CardContent>
