@@ -200,13 +200,14 @@ const Ingredients = () => {
     if (!user) return;
 
     try {
-      const costPerKg = parseFloat(formData.cost_per_kg) || 0;
+      // Parse cost per kg, but preserve user input if they entered a value
+      const costPerKg = formData.cost_per_kg === '' ? 0 : parseFloat(formData.cost_per_kg);
       
-      // Validate cost per kg - ensure it's not negative and handle empty values properly
-      if (formData.cost_per_kg !== '' && costPerKg < 0) {
+      // Validate cost per kg - ensure it's not negative
+      if (isNaN(costPerKg) || costPerKg < 0) {
         toast({
           title: "Validation Error",
-          description: "Cost per kg cannot be negative",
+          description: "Cost per kg must be a valid positive number",
           variant: "destructive",
         });
         return;
