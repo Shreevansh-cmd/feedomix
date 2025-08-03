@@ -202,8 +202,8 @@ const Ingredients = () => {
     try {
       const costPerKg = parseFloat(formData.cost_per_kg) || 0;
       
-      // Validate cost per kg
-      if (costPerKg < 0) {
+      // Validate cost per kg - ensure it's not negative and handle empty values properly
+      if (formData.cost_per_kg !== '' && costPerKg < 0) {
         toast({
           title: "Validation Error",
           description: "Cost per kg cannot be negative",
@@ -251,7 +251,7 @@ const Ingredients = () => {
 
         toast({
           title: "Success",
-          description: "Ingredient updated successfully",
+          description: finalCostPerKg > 0 ? "Price updated successfully" : "Ingredient updated successfully",
         });
       } else {
         // Create new ingredient
@@ -335,9 +335,10 @@ const Ingredients = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Add/Edit Ingredient Form */}
-          <Card className="shadow-lg border-green-200">
+        <div className="flex flex-col lg:flex-row gap-8 min-h-[600px]">
+          {/* Add/Edit Ingredient Form - Fixed width */}
+          <div className="lg:flex-1 lg:max-w-lg">
+            <Card className="shadow-lg border-green-200 h-full">
             <CardHeader className="bg-green-100">
               <CardTitle className="text-green-800 flex items-center gap-2">
                 {editingId ? <Edit className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
@@ -485,7 +486,11 @@ const Ingredients = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" className="flex-1">
+                  <Button 
+                    type="submit" 
+                    className="flex-1"
+                    disabled={!formData.name.trim()}
+                  >
                     {editingId ? 'Update Ingredient' : 'Add Ingredient'}
                   </Button>
                   {editingId && (
@@ -497,9 +502,11 @@ const Ingredients = () => {
               </form>
             </CardContent>
           </Card>
+          </div>
 
-          {/* Ingredients List */}
-          <Card className="shadow-lg border-blue-200">
+          {/* Ingredients List - Fixed width and height */}
+          <div className="lg:flex-[2] lg:min-w-0">
+            <Card className="shadow-lg border-blue-200 h-full">
             <CardHeader className="bg-blue-100">
               <CardTitle className="text-blue-800">Your Ingredients</CardTitle>
               <CardDescription>
@@ -652,6 +659,7 @@ const Ingredients = () => {
               </Tabs>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     </div>
